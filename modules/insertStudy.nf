@@ -19,13 +19,7 @@ process insertEntityTypeGraph {
     else if(params.project == "MicrobiomeDB") {
         template 'insertMicrobiomeEntityGraph.bash'
     }
-//    else if(params.project == "VectorBase") {
-//        template 'insertVectorBaseEntityGraph.bash'
-//    }
 
-    else if(params.isaFormat == "isatab") {
-        template 'insertEntityGraphFromISATab.bash'
-    }
     else {
         template 'insertEntityGraph.bash'
     }
