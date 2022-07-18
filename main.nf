@@ -19,6 +19,12 @@ else {
     throw new Exception("missing params.webDisplayOntologyFile");
 }
 
+params.internalUseIsaSimpleParser = "";
+params.internalOntologyMappingFile = "";
+params.internalDateObfuscationFile = "";
+params.internalValueMappingFile = "";
+params.internalOntologyMappingOverrideBaseName = "";
+
 
 if(params.isaFormat.toLowerCase() == "simple") {
     params.internalInvestigationFile = params.studyDirectory + "/" + params.investigationBaseName
