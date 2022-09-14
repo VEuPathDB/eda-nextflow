@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-echo ga ApiCommonData::Load::Plugin::LoadEntityTypeAndAttributeGraphs \\
+ga ApiCommonData::Load::Plugin::LoadEntityTypeAndAttributeGraphs \\
     --logDir \$PWD \\
     --extDbRlsSpec \'$extDbRlsSpec\' \\
     --ontologyExtDbRlsSpec \'$webDisplayOntologySpec\' \\

@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-echo ga GUS::Supported::Plugin::InsertOntologySynonymAttributes \\
+ga GUS::Supported::Plugin::InsertOntologySynonymAttributes \\
 --extDbRlsSpec \'$webDisplayOntologySpec\' \\
 --attributesFile ${params.internalUpdateSynonymsFile} \\
 --append 1 \\

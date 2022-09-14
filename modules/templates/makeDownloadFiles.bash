@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-echo ga ApiCommonData::Load::Plugin::MakeEntityDownloadFiles \\
+ga ApiCommonData::Load::Plugin::MakeEntityDownloadFiles \\
   --commit \\
   --extDbRlsSpec \'$extDbRlsSpec\' \\
   --fileBasename $params.downloadFileBaseName \\

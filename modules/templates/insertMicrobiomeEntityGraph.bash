@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-echo ga ApiCommonData::Load::Plugin::MBioInsertEntityGraph \\
+ga ApiCommonData::Load::Plugin::MBioInsertEntityGraph \\
   --commit \\
   --investigationFile $params.internalInvestigationFile \\
   --sampleDetailsFile $params.sampleDetailsFile \\

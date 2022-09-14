@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-echo ga ApiCommonData::Load::Plugin::LoadDatasetSpecificEntityGraph \\
+ga ApiCommonData::Load::Plugin::LoadDatasetSpecificEntityGraph \\
     --extDbRlsSpec \'$extDbRlsSpec\' \\
     --schema $params.schema \\
     --commit;

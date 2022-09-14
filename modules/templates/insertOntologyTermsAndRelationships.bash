@@ -9,4 +9,4 @@ echo ga GUS::Supported::Plugin::InsertOntologyTermsAndRelationships \\
     --relTypeExtDbRlsSpec 'Ontology_Relationship_Types_RSRC|%' \\
     --commit
 
-echo "DONE";
+echo "DONE Loading Ontology Terms And Relationships";

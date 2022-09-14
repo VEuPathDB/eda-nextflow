@@ -5,14 +5,14 @@ nextflow.enable.dsl=2
 // Param checking and set some internal param values
 //---------------------------------------------------------------------------------
 
-if(params.studyDirectory) {
+if(params.studyDirectory != "NA") {
     file(params.studyDirectory, type: "dir", checkIfExists: true);
 }
 else {
     throw new Exception("missing params.studyDirectory");
 }
 
-if(params.webDisplayOntologyFile) {
+if(params.webDisplayOntologyFile != "NA") {
     file(params.webDisplayOntologyFile, checkIfExists: true)
 }
 else {
@@ -24,7 +24,7 @@ params.internalOntologyMappingFile = "";
 params.internalDateObfuscationFile = "";
 params.internalValueMappingFile = "";
 params.internalOntologyMappingOverrideBaseName = "";
-
+params.internalInvestigationSubset = params.investigationSubset != "NA" ? "--investigationSubset " +  params.investigationSubset : "";
 
 if(params.isaFormat.toLowerCase() == "simple") {
     params.internalInvestigationFile = params.studyDirectory + "/" + params.investigationBaseName
@@ -63,11 +63,9 @@ else {
     throw new Exception("param isaFormat must be simple|isatab")
 }
 
-
-
 params.internalRunRLocally = params.schema == 'ApidbUserDatasets' ? "--runRLocally" : ''
 
-if(params.optionalMegaStudyYaml && file(params.optionalMegaStudyYaml).exists()) {
+if(params.optionalMegaStudyYaml != "NA" && file(params.optionalMegaStudyYaml).exists()) {
     params.internalMegaStudyYaml =  "--megaStudyYaml $params.optionalMegaStudyYaml";
 }
 
@@ -83,4 +81,5 @@ include { dumpFiles } from './modules/fileDumper.nf'
 //---------------------------------------------------------------------------------
 workflow {
     loadOntologyStuff | loadStudy | dumpFiles
+
 }
