@@ -10,7 +10,7 @@ process updateOntologySynonyms {
 
     output:
     val webDisplayOntologySpec, emit: webDisplayOntologySpec
-    stdout emit: logData
+    stdout emit: verbiage
 
     when:
     file(params.internalUpdateSynonymsFile).exists()

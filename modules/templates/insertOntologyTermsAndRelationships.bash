@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-echo ga GUS::Supported::Plugin::InsertOntologyTermsAndRelationships \\
+ga GUS::Supported::Plugin::InsertOntologyTermsAndRelationships \\
     -inFile ${params.webDisplayOntologyFile} \\
     --owlReader ApiCommonData::Load::OwlReader \\
     --extDbRlsSpec \'$extDbRlsSpec\' \\

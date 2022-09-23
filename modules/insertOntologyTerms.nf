@@ -13,6 +13,7 @@ process insertOntologyTermsAndRelationships {
 
     input:
     val extDbRlsSpec
+    stdin
 
     output:
     val extDbRlsSpec
@@ -22,25 +23,39 @@ process insertOntologyTermsAndRelationships {
     template 'insertOntologyTermsAndRelationships.bash'
 }
 
+process startUpdateSynonyms {
+    input:
+    val extDbRlsSpec
+
+    output:
+    val extDbRlsSpec
+    stdout
+
+    script:
+    """
+    echo "Ready to update ontology synonyms!"
+    """
+}
+
 
 workflow loadOntologyStuff {
     main:
     webDisplaySpecChannel = Channel.value(params.webDisplayOntologySpec)
-    logData = Channel.value("LOG")
+
     if(params.loadWebDisplayOntologyFile) {
         def (databaseName, databaseVersion) = params.webDisplayOntologySpec.split("\\|");
 
         insertExternalDatabaseAndRelease(databaseName, databaseVersion) \
-         | insertOntologyTermsAndRelationships
+            | insertOntologyTermsAndRelationships \
             | (updateEntityTypes & updateOrdinals & updateOwlAttributes)
     }
     else {
-        updateEntityTypes(webDisplaySpecChannel, logData);
-        updateOrdinals(webDisplaySpecChannel, logData);
-        updateOwlAttributes(webDisplaySpecChannel, logData);
+        startUpdateSynonyms(webDisplaySpecChannel) \
+            | (updateEntityTypes & updateOrdinals & updateOwlAttributes)
+
     }
 
     emit:
-    extDbRlsSpec = webDisplaySpecChannel.concat(updateEntityTypes.out.webDisplayOntologySpec, updateOrdinals.out.webDisplayOntologySpec, updateOwlAttributes.out.webDisplayOntologySpec).distinct();
-    logData = logData.concat(updateEntityTypes.out.logData, updateOrdinals.out.logData, updateOwlAttributes.out.logData);
+    extDbRlsSpec = webDisplaySpecChannel;
+    ontologyOut = webDisplaySpecChannel.concat(updateEntityTypes.out.verbiage, updateOrdinals.out.verbiage, updateOwlAttributes.out.verbiage);
 }

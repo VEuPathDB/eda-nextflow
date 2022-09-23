@@ -9,7 +9,7 @@ process insertEntityTypeGraph {
     input:
     val extDbRlsSpec
     val webDisplayOntologySpec
-    stdin
+    val isReady
 
     output:
     val extDbRlsSpec
@@ -93,15 +93,13 @@ process loadDatasetSpecificTables {
 workflow loadStudy {
     take:
     webDisplayOntologySpec
-    logData
+    ontologyOut
 
     main:
-//    extDbSpec = Channel.value(params.extDbRlsSpec)
-
     def (databaseName, databaseVersion) = params.extDbRlsSpec.split("\\|");
     insertExternalDatabaseAndRelease(databaseName, databaseVersion);
 
-    insertEntityTypeGraph(insertExternalDatabaseAndRelease.out[0], webDisplayOntologySpec, logData.concat(insertExternalDatabaseAndRelease.out[1])) \
+    insertEntityTypeGraph(insertExternalDatabaseAndRelease.out[0], webDisplayOntologySpec, ontologyOut) \
         | loadAttributesAndValues \
         | loadEntityTypeAndAttributeGraphs \
         | loadDatasetSpecificTables

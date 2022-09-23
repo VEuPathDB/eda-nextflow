@@ -15,9 +15,7 @@ else {
 if(params.webDisplayOntologyFile != "NA") {
     file(params.webDisplayOntologyFile, checkIfExists: true)
 }
-else {
-    throw new Exception("missing params.webDisplayOntologyFile");
-}
+
 
 params.internalUseIsaSimpleParser = "";
 params.internalOntologyMappingFile = "";
@@ -80,6 +78,5 @@ include { dumpFiles } from './modules/fileDumper.nf'
 // Main workflow
 //---------------------------------------------------------------------------------
 workflow {
-    loadOntologyStuff | loadStudy | dumpFiles
-
+    loadOntologyStuff() | loadStudy
 }
