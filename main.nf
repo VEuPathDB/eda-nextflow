@@ -57,8 +57,9 @@ if(params.isaFormat.toLowerCase() == "simple") {
 
 }
 else if(params.isaFormat == "isatab") { } // nothing to see here
+else if(params.isaFormat == "NA" && params.optionalMegaStudyYaml != "NA") {} // nothing to see here
 else {
-    throw new Exception("param isaFormat must be simple|isatab")
+    throw new Exception("for non mega studies, param isaFormat must be simple|isatab")
 }
 
 params.internalRunRLocally = params.schema == 'ApidbUserDatasets' ? "--runRLocally" : ''
