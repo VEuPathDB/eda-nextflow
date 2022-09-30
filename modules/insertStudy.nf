@@ -80,12 +80,7 @@ process loadDatasetSpecificTables {
     stdout
 
     script:
-    if(params.optionalMegaStudyYaml != "NA"  && file(params.optionalMegaStudyYaml).exists()) {
-        template 'loadMegaDatasetSpecificTables.bash'
-    }
-    else{
-        template 'loadDatasetSpecificTables.bash'
-    }
+    template 'loadDatasetSpecificTables.bash'
 }
 
 
