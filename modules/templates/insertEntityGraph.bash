@@ -9,4 +9,9 @@ ga ApiCommonData::Load::Plugin::InsertEntityGraph $params.internalInvestigationS
   --metaDataRoot $params.studyDirectory \\
   --schema $params.schema
 
+  if [ $params.speciesReconciliationOntologySpec != "NA" ]; then
+    echo reconcilePopBioSpecies.pl --fallbackSpecies \'$params.speciesReconciliationFallbackSpecies\' --veupathOntologySpec \'$params.speciesReconciliationOntologySpec\' --extDbRlsSpec \'$extDbRlsSpec\'
+  fi
+
+
 echo "DONE";
