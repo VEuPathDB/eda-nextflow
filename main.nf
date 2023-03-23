@@ -71,13 +71,13 @@ if(params.optionalMegaStudyYaml != "NA" && file(params.optionalMegaStudyYaml).ex
 //---------------------------------------------------------------------------------
 // Includes
 //---------------------------------------------------------------------------------
-include { loadOntologyStuff } from './modules/insertOntologyTerms.nf'
-include { loadStudy } from './modules/insertStudy.nf'
+include { loadInitialOntology } from './modules/insertOntologyTerms.nf'
+include { loadEntityGraph; loadDatasetSpecificAnnotationPropertiesAndGraphs } from './modules/insertStudy.nf'
 include { dumpFiles } from './modules/fileDumper.nf'
 
 //---------------------------------------------------------------------------------
 // Main workflow
 //---------------------------------------------------------------------------------
 workflow {
-    loadOntologyStuff() | loadStudy
+    loadInitialOntology | loadEntityGraph | loadDatasetSpecificAnnotationPropertiesAndGraphs
 }

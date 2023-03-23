@@ -5,13 +5,18 @@ process insertExternalDatabaseAndRelease {
     tag "plugin"
 
     input:
-    val databaseName
-    val databaseVersion
+    tuple val(databaseName), val(databaseVersion)
 
     output:
-    val "$databaseName|$databaseVersion"
     stdout
+
 
     script:
     template 'insertExternalDatabaseAndRelease.bash'
+
+    stub:
+    """
+    echo "insert external database and release"
+    """
+
 }

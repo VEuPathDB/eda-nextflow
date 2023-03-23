@@ -3,17 +3,20 @@ nextflow.enable.dsl=2
 
 include { insertExternalDatabaseAndRelease } from './insertExternalDatabase.nf'
 
+webDisplaySpec = Channel.value(params.webDisplayOntologySpec);
+extDBRlsSpec = Channel.value(params.extDbRlsSpec);
+
+
 process insertEntityTypeGraph {
     tag "plugin"
 
     input:
     val extDbRlsSpec
     val webDisplayOntologySpec
-    val isReady
+    val extDBIsReady
+    val ontologySpecIsReady
 
     output:
-    val extDbRlsSpec
-    val webDisplayOntologySpec
     stdout
 
     script:
@@ -29,6 +32,13 @@ process insertEntityTypeGraph {
     else {
         template 'insertEntityGraph.bash'
     }
+
+
+    stub:
+    """
+    echo "insert entity type graph"
+    """
+
 }
 
 process loadAttributesAndValues {
@@ -40,13 +50,18 @@ process loadAttributesAndValues {
     stdin
 
     output:
-    val extDbRlsSpec
-    val webDisplayOntologySpec
     stdout
 
     script:
 
     template 'loadAttributesAndValues.bash'
+
+
+    stub:
+    """
+    echo "load attribute values"
+    """
+
 }
 
 process loadEntityTypeAndAttributeGraphs {
@@ -58,13 +73,42 @@ process loadEntityTypeAndAttributeGraphs {
     stdin
 
     output:
-    val extDbRlsSpec
-    val webDisplayOntologySpec
     stdout
 
     script:
     template 'loadEntityTypeAndAttributeGraphs.bash'
+
+    stub:
+    """
+    echo "load attribute graph and entity type graph"
+    """
+
 }
+
+
+
+process loadAnnotationProperties {
+    tag "plugin"
+
+    input:
+    val extDbRlsSpec
+    stdin
+
+    output:
+    stdout
+
+    script:
+    template 'loadAnnotationProperties.bash'
+
+
+    stub:
+    """
+    echo "load annotation properties tables"
+    """
+
+}
+
+
 
 process loadDatasetSpecificTables {
     tag "plugin"
@@ -75,31 +119,56 @@ process loadDatasetSpecificTables {
     stdin
 
     output:
-    val extDbRlsSpec, emit: extDbRlsSpec
-    val webDisplayOntologySpec, emit: webDisplayOntologySpec
     stdout
 
     script:
     template 'loadDatasetSpecificTables.bash'
+
+
+    stub:
+    """
+    echo "load dataset specific tables"
+    """
+
+}
+
+workflow loadEntityGraph {
+    take:
+    initOntologyOut
+
+    main:
+
+    def (databaseName, databaseVersion) = params.extDbRlsSpec.split("\\|");
+
+    extDbRlsOut = insertExternalDatabaseAndRelease(tuple databaseName, databaseVersion);
+
+    entityGraphOut = insertEntityTypeGraph(extDBRlsSpec, webDisplaySpec, extDbRlsOut, initOntologyOut);
+    attributesOut = loadAttributesAndValues(extDBRlsSpec, webDisplaySpec, entityGraphOut);
+
+    emit:
+    attributesOut
 }
 
 
-
-workflow loadStudy {
+workflow loadDatasetSpecificAnnotationPropertiesAndGraphs {
     take:
-    webDisplayOntologySpec
-    ontologyOut
+    entityGraphOut
 
     main:
-    def (databaseName, databaseVersion) = params.extDbRlsSpec.split("\\|");
-    insertExternalDatabaseAndRelease(databaseName, databaseVersion);
 
-    insertEntityTypeGraph(insertExternalDatabaseAndRelease.out[0], webDisplayOntologySpec, ontologyOut) \
-        | loadAttributesAndValues \
-        | loadEntityTypeAndAttributeGraphs \
-        | loadDatasetSpecificTables
+    annPropOut = loadAnnotationProperties(extDBRlsSpec, entityGraphOut);
+    graphsOut = loadEntityTypeAndAttributeGraphs(extDBRlsSpec, webDisplaySpec, annPropOut);
+    datasetTablesOut = loadDatasetSpecificTables(extDBRlsSpec, webDisplaySpec, graphsOut)
 
-//    emit:
-//    loadDatasetSpecificTables.out.extDbRlsSpec
-//    loadDatasetSpecificTables.out.webDisplayOntologySpec
+
+    emit:
+    datasetTablesOut
+}
+
+workflow loadEntityGraphEntry {
+    loadEntityGraph(Channel.value("READY!"));
+}
+
+workflow loadDatasetSpecificAnnotationPropertiesAndGraphsEntry {
+    loadDatasetSpecificAnnotationPropertiesAndGraphs(Channel.value("READY!"));
 }

@@ -17,4 +17,12 @@ process updateOntologySynonyms {
 
     script:
     template 'updateOntologySynonyms.bash'
+
+
+    stub:
+    """
+    echo "insert annotatino properties"
+    """
+
+
 }

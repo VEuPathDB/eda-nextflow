@@ -12,6 +12,13 @@ process makeDownloadFiles {
 
     script:
     template 'makeDownloadFiles.bash'
+
+    stub:
+    """
+    echo "make download files"
+    """
+
+
 }
 
 workflow dumpFiles {
