@@ -156,7 +156,11 @@ workflow loadDatasetSpecificAnnotationPropertiesAndGraphs {
 
     main:
 
-    annPropOut = loadAnnotationProperties(extDBRlsSpec, entityGraphOut);
+    annPropOut = Channel.value("READY!");
+    if(params.optionalAnnotationPropertiesFile != "NA") {
+        annPropOut = loadAnnotationProperties(extDBRlsSpec, entityGraphOut);
+    }
+
     graphsOut = loadEntityTypeAndAttributeGraphs(extDBRlsSpec, webDisplaySpec, annPropOut);
     datasetTablesOut = loadDatasetSpecificTables(extDBRlsSpec, webDisplaySpec, graphsOut)
 

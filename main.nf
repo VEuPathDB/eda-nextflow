@@ -16,6 +16,9 @@ if(params.webDisplayOntologyFile != "NA") {
     file(params.webDisplayOntologyFile, checkIfExists: true)
 }
 
+if(params.optionalAnnotationPropertiesFile != "NA") {
+    file(params.optionalAnnotationPropertiesFile, checkIfExists: true);
+}
 
 params.internalUseIsaSimpleParser = "";
 params.internalOntologyMappingFile = "";

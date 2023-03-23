@@ -2,9 +2,9 @@
 
 set -euo pipefail
 
-ga ApiCommonData::Load::Plugin::LoadAnnotationProperties \\
+ga ApiCommonData::Load::Plugin::InsertAnnotationProperties \\
     --extDbRlsSpec \'$extDbRlsSpec\' \\
-    --annotationPropertiesFile TODO
+    --attributesFile $params.optionalAnnotationPropertiesFile \\
     --schema $params.schema \\
     --commit
 
