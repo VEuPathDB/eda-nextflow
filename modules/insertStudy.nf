@@ -169,10 +169,3 @@ workflow loadDatasetSpecificAnnotationPropertiesAndGraphs {
     datasetTablesOut
 }
 
-workflow loadEntityGraphEntry {
-    loadEntityGraph(Channel.value("READY!"));
-}
-
-workflow loadDatasetSpecificAnnotationPropertiesAndGraphsEntry {
-    loadDatasetSpecificAnnotationPropertiesAndGraphs(Channel.value("READY!"));
-}

@@ -84,3 +84,11 @@ include { dumpFiles } from './modules/fileDumper.nf'
 workflow {
     loadInitialOntology | loadEntityGraph | loadDatasetSpecificAnnotationPropertiesAndGraphs
 }
+
+workflow loadEntityGraphEntry {
+    loadEntityGraph(Channel.value("READY!"));
+}
+
+workflow loadDatasetSpecificAnnotationPropertiesAndGraphsEntry {
+    loadDatasetSpecificAnnotationPropertiesAndGraphs(Channel.value("READY!"));
+}
