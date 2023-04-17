@@ -20,12 +20,19 @@ if(params.optionalAnnotationPropertiesFile != "NA") {
     file(params.optionalAnnotationPropertiesFile, checkIfExists: true);
 }
 
+
+params.internalUseOntologyTermTableForTaxonTerms = "";
 params.internalUseIsaSimpleParser = "";
 params.internalOntologyMappingFile = "";
 params.internalDateObfuscationFile = "";
 params.internalValueMappingFile = "";
 params.internalOntologyMappingOverrideBaseName = "";
 params.internalInvestigationSubset = params.investigationSubset != "NA" ? "--investigationSubset " +  params.investigationSubset : "";
+
+
+if(params.useOntologyTermTableForTaxonTerms) {
+    params.internalUseOntologyTermTableForTaxonTerms = "--useOntologyTermTableForTaxonTerms";
+}
 
 if(params.isaFormat.toLowerCase() == "simple") {
     params.internalInvestigationFile = params.studyDirectory + "/" + params.investigationBaseName
