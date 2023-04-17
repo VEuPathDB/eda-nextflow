@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-ga ApiCommonData::Load::Plugin::InsertEntityGraph $internalUseOntologyTermTableForTaxonTerms $internalInvestigationSubset $internalUseIsaSimpleParser $internalOntologyMappingFile $internalDateObfuscationFile $internalValueMappingFile $internalOntologyMappingOverrideBaseName \\
+ga ApiCommonData::Load::Plugin::InsertEntityGraph $params.internalUseOntologyTermTableForTaxonTerms $params.internalInvestigationSubset $params.internalUseIsaSimpleParser $params.internalOntologyMappingFile $params.internalDateObfuscationFile $params.internalValueMappingFile $params.internalOntologyMappingOverrideBaseName \\
   --commit \\
   --extDbRlsSpec \'$extDbRlsSpec\' \\
   --investigationBaseName $params.investigationBaseName \\

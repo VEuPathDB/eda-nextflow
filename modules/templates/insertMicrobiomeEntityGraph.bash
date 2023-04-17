@@ -4,7 +4,7 @@ set -euo pipefail
 
 ga ApiCommonData::Load::Plugin::MBioInsertEntityGraph \\
   --commit \\
-  --investigationFile $internalInvestigationFile \\
+  --investigationFile $params.internalInvestigationFile \\
   --sampleDetailsFile $params.sampleDetailsFile \\
   --mbioResultsDir $params.assayResultsDirectory \\
   --mbioResultsFileExtensions $params.assayResultsFileExtensionsJson \\

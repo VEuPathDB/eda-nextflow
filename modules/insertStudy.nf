@@ -6,47 +6,47 @@ include { insertExternalDatabaseAndRelease } from './insertExternalDatabase.nf'
 webDisplaySpec = Channel.value(params.webDisplayOntologySpec);
 extDBRlsSpec = Channel.value(params.extDbRlsSpec);
 
-def internalUseOntologyTermTableForTaxonTerms = "";
-def internalUseIsaSimpleParser = "";
-def internalOntologyMappingFile = "";
-def internalDateObfuscationFile = "";
-def internalValueMappingFile = "";
-def internalOntologyMappingOverrideBaseName = "";
-def internalInvestigationSubset = params.investigationSubset != "NA" ? "--investigationSubset " +  params.investigationSubset : "";
+params.internalUseOntologyTermTableForTaxonTerms = "";
+params.internalUseIsaSimpleParser = "";
+params.internalOntologyMappingFile = "";
+params.internalDateObfuscationFile = "";
+params.internalValueMappingFile = "";
+params.internalOntologyMappingOverrideBaseName = "";
+params.internalInvestigationSubset = params.investigationSubset != "NA" ? "--investigationSubset " +  params.investigationSubset : "";
 
 if(params.useOntologyTermTableForTaxonTerms) {
-    internalUseOntologyTermTableForTaxonTerms = "--useOntologyTermTableForTaxonTerms";
+    params.internalUseOntologyTermTableForTaxonTerms = "--useOntologyTermTableForTaxonTerms";
 }
 
 if(params.isaFormat.toLowerCase() == "simple") {
-    internalInvestigationFile = params.studyDirectory + "/" + params.investigationBaseName
+    params.internalInvestigationFile = params.studyDirectory + "/" + params.investigationBaseName
 
-    internalOntologyMappingFile = "--ontologyMappingFile " + params.webDisplayOntologyFile;
-    internalUseIsaSimpleParser = "--isSimpleConfiguration ";
+    params.internalOntologyMappingFile = "--ontologyMappingFile " + params.webDisplayOntologyFile;
+    params.internalUseIsaSimpleParser = "--isSimpleConfiguration ";
 
     if(params.optionalDateObfuscationFile != "NA") {
         file(params.optionalDateObfuscationFile, checkIfExists: true);
-        internalDateObfuscationFile = "--dateObfuscationFile " + params.optionalDateObfuscationFile;
+        params.internalDateObfuscationFile = "--dateObfuscationFile " + params.optionalDateObfuscationFile;
     }
     else {
-        internalDateObfuscationFile = "";
+        params.internalDateObfuscationFile = "";
     }
 
     if(params.optionalValueMappingFile != "NA") {
         file(params.optionalValueMappingFile, checkIfExists: true)
-        internalValueMappingFile = "--valueMappingFile " + params.optionalValueMappingFile;
+        params.internalValueMappingFile = "--valueMappingFile " + params.optionalValueMappingFile;
     }
     else {
-        internalValueMappingFile = "";
+        params.internalValueMappingFile = "";
     }
 
     if(params.optionalOntologyMappingOverrideBaseName != "NA") {
-        internalOntologyMappingOverrideFile = params.studyDirectory + "/" + params.optionalOntologyMappingOverrideBaseName
-        file(internalOntologyMappingOverrideFile, checkIfExists: true);
-        internalOntologyMappingOverrideBaseName = "--ontologyMappingOverrideFileBaseName " + params.optionalOntologyMappingOverrideBaseName;
+        params.internalOntologyMappingOverrideFile = params.studyDirectory + "/" + params.optionalOntologyMappingOverrideBaseName
+        file(params.internalOntologyMappingOverrideFile, checkIfExists: true);
+        params.internalOntologyMappingOverrideBaseName = "--ontologyMappingOverrideFileBaseName " + params.optionalOntologyMappingOverrideBaseName;
     }
     else {
-        internalOntologyMappingOverrideBaseName = "";
+        params.internalOntologyMappingOverrideBaseName = "";
     }
 
 }
@@ -56,10 +56,10 @@ else {
     throw new Exception("for non mega studies, param isaFormat must be simple|isatab")
 }
 
-internalRunRLocally = params.schema == 'ApidbUserDatasets' ? "--runRLocally" : ''
+params.internalRunRLocally = params.schema == 'ApidbUserDatasets' ? "--runRLocally" : ''
 
 if(params.optionalMegaStudyYaml != "NA" && file(params.optionalMegaStudyYaml).exists()) {
-    internalMegaStudyYaml =  "--megaStudyYaml $params.optionalMegaStudyYaml";
+    params.internalMegaStudyYaml =  "--megaStudyYaml $params.optionalMegaStudyYaml";
 }
 
 
@@ -93,8 +93,6 @@ process insertEntityTypeGraph {
     stub:
     """
     echo "insert entity type graph"
-    echo $internalUseOntologyTermTableForTaxonTerms
-    echo $params.useOntologyTermTableForTaxonTerms
     """
 
 }

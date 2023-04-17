@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-ga ApiCommonData::Load::Plugin::InsertMegaEntityGraph  $internalMegaStudyYaml \\
+ga ApiCommonData::Load::Plugin::InsertMegaEntityGraph  $params.internalMegaStudyYaml \\
   --commit \\
   --extDbRlsSpec \'$extDbRlsSpec\' \\
   --studyStableId $params.megaStudyStableId \\

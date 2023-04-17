@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-ga ApiCommonData::Load::Plugin::LoadAttributesFromEntityGraph $internalRunRLocally \\
+ga ApiCommonData::Load::Plugin::LoadAttributesFromEntityGraph $params.internalRunRLocally \\
     --logDir \$PWD \\
     --extDbRlsSpec \'$extDbRlsSpec\' \\
     --ontologyExtDbRlsSpec \'$webDisplayOntologySpec\' \\
