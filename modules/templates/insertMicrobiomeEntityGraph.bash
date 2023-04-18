@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-
+internalInvestigationFile="${params.studyDirectory}/${params.investigationBaseName}";
 ga ApiCommonData::Load::Plugin::MBioInsertEntityGraph \\
   --commit \\
-  --investigationFile $params.internalInvestigationFile \\
+  --investigationFile \$internalInvestigationFile \\
   --sampleDetailsFile $params.sampleDetailsFile \\
   --mbioResultsDir $params.assayResultsDirectory \\
   --mbioResultsFileExtensions $params.assayResultsFileExtensionsJson \\

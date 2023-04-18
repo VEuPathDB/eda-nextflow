@@ -2,7 +2,12 @@
 
 set -euo pipefail
 
-ga ApiCommonData::Load::Plugin::LoadAttributesFromEntityGraph $params.internalRunRLocally \\
+internalRunRLocally="";
+if [ "$params.schema" == "ApidbUserDatasets" ] ; then
+    internalRunRLocally="--runRLocally";
+fi
+
+ga ApiCommonData::Load::Plugin::LoadAttributesFromEntityGraph \$internalRunRLocally \\
     --logDir \$PWD \\
     --extDbRlsSpec \'$extDbRlsSpec\' \\
     --ontologyExtDbRlsSpec \'$webDisplayOntologySpec\' \\

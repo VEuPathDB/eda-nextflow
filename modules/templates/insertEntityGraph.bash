@@ -2,7 +2,42 @@
 
 set -euo pipefail
 
-ga ApiCommonData::Load::Plugin::InsertEntityGraph $params.internalUseOntologyTermTableForTaxonTerms $params.internalInvestigationSubset $params.internalUseIsaSimpleParser $params.internalOntologyMappingFile $params.internalDateObfuscationFile $params.internalValueMappingFile $params.internalOntologyMappingOverrideBaseName \\
+internalUseOntologyTermTableForTaxonTerms="";
+internalUseIsaSimpleParser="";
+internalOntologyMappingFile="";
+internalDateObfuscationFile="";
+internalValueMappingFile="";
+internalOntologyMappingOverrideBaseName="";
+internalInvestigationSubset="";
+
+if [ "$params.investigationSubset" != "NA" ] ; then
+  internalInvestigationSubset="--investigationSubset $params.investigationSubset";
+fi
+
+if [ "$params.useOntologyTermTableForTaxonTerms" = true ] ; then
+    internalUseOntologyTermTableForTaxonTerms="--useOntologyTermTableForTaxonTerms";
+fi
+
+# two commas here makes string lower case
+if [ "$params.isaFormat" == "simple" ] ; then
+    internalInvestigationFile="${params.studyDirectory}/${params.investigationBaseName}";
+    internalOntologyMappingFile="--ontologyMappingFile ${params.webDisplayOntologyFile}";
+    internalUseIsaSimpleParser="--isSimpleConfiguration ";
+
+    if [ "${params.optionalDateObfuscationFile}" != "NA" ] ; then
+        internalDateObfuscationFile="--dateObfuscationFile ${params.optionalDateObfuscationFile}";
+    fi
+
+    if [ "${params.optionalValueMappingFile}" != "NA" ] ; then
+        internalValueMappingFile="--valueMappingFile ${params.optionalValueMappingFile}";
+    fi
+
+    if [ "${params.optionalOntologyMappingOverrideBaseName}" != "NA" ] ; then
+        internalOntologyMappingOverrideBaseName="--ontologyMappingOverrideFileBaseName ${params.optionalOntologyMappingOverrideBaseName}";
+    fi
+fi
+
+ga ApiCommonData::Load::Plugin::InsertEntityGraph \$internalUseOntologyTermTableForTaxonTerms \$internalInvestigationSubset \$internalUseIsaSimpleParser \$internalOntologyMappingFile \$internalDateObfuscationFile \$internalValueMappingFile \$internalOntologyMappingOverrideBaseName \\
   --commit \\
   --extDbRlsSpec \'$extDbRlsSpec\' \\
   --investigationBaseName $params.investigationBaseName \\
