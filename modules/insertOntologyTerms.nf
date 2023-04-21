@@ -32,7 +32,7 @@ workflow loadInitialOntology {
 
     if(params.loadWebDisplayOntologyFile) {
         def (databaseName, databaseVersion) = params.webDisplayOntologySpec.split("\\|");
-        extDbRlsOut = insertExternalDatabaseAndRelease(tuple databaseName, databaseVersion)
+        extDbRlsOut = insertExternalDatabaseAndRelease(tuple databaseName, databaseVersion);
         initOntologyOut = insertOntologyTermsAndRelationships(webDisplaySpecChannel, extDbRlsOut);
     }
 
