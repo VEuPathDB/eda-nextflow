@@ -7,7 +7,7 @@ internalUseIsaSimpleParser="";
 internalOntologyMappingFile="";
 internalDateObfuscationFile="";
 internalValueMappingFile="";
-internalOntologyMappingOverrideBaseName="";
+internalOntologyMappingOverrideFile="";
 internalInvestigationSubset="";
 
 if [ "$params.investigationSubset" != "NA" ] ; then
@@ -32,12 +32,12 @@ if [ "$params.isaFormat" == "simple" ] ; then
         internalValueMappingFile="--valueMappingFile ${params.optionalValueMappingFile}";
     fi
 
-    if [ "${params.optionalOntologyMappingOverrideBaseName}" != "NA" ] ; then
-        internalOntologyMappingOverrideBaseName="--ontologyMappingOverrideFileBaseName ${params.optionalOntologyMappingOverrideBaseName}";
+    if [ "${params.optionalOntologyMappingOverrideFile}" != "NA" ] ; then
+        internalOntologyMappingOverrideFile="--ontologyMappingOverrideFileBaseName ${params.optionalOntologyMappingOverrideFile}";
     fi
 fi
 
-ga ApiCommonData::Load::Plugin::InsertEntityGraph \$internalUseOntologyTermTableForTaxonTerms \$internalInvestigationSubset \$internalUseIsaSimpleParser \$internalOntologyMappingFile \$internalDateObfuscationFile \$internalValueMappingFile \$internalOntologyMappingOverrideBaseName \\
+ga ApiCommonData::Load::Plugin::InsertEntityGraph \$internalUseOntologyTermTableForTaxonTerms \$internalInvestigationSubset \$internalUseIsaSimpleParser \$internalOntologyMappingFile \$internalDateObfuscationFile \$internalValueMappingFile \$internalOntologyMappingOverrideFile \\
   --commit \\
   --extDbRlsSpec \'$extDbRlsSpec\' \\
   --investigationBaseName $params.investigationBaseName \\

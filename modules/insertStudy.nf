@@ -16,9 +16,8 @@ extDBRlsSpec = Channel.value(params.extDbRlsSpec)
          file(params.optionalValueMappingFile, checkIfExists: true)
      }
 
-     if(params.optionalOntologyMappingOverrideBaseName != "NA") {
-         params.internalOntologyMappingOverrideFile = params.studyDirectory + "/" + params.optionalOntologyMappingOverrideBaseName
-         file(params.internalOntologyMappingOverrideFile, checkIfExists: true)
+     if(params.optionalOntologyMappingOverrideFile != "NA") {
+         file(params.optionalOntologyMappingOverrideFile, checkIfExists: true)
      }
  }
  else if(params.isaFormat == "isatab") { } // nothing to see here
