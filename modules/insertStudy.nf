@@ -13,11 +13,11 @@ extDBRlsSpec = Channel.value(params.extDbRlsSpec);
      }
 
      if(params.optionalValueMappingFile != "NA") {
-         file(params.optionalValueMappingFile, checkIfExists: true);
+         file(params.optionalValueMappingFile, checkIfExists: true)
      }
 
      if(params.optionalOntologyMappingOverrideBaseName != "NA") {
-         params.internalOntologyMappingOverrideFile = params.studyDirectory + "/" + params.optionalOntologyMappingOverrideBaseName;
+         params.internalOntologyMappingOverrideFile = params.studyDirectory + "/" + params.optionalOntologyMappingOverrideBaseName
          file(params.internalOntologyMappingOverrideFile, checkIfExists: true);
      }
  }
