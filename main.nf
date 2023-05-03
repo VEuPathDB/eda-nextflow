@@ -35,7 +35,7 @@ workflow {
 }
 
 workflow loadEntityGraphEntry {
-    loadEntityGraph(Channel.value("READY!"));
+    loadInitialOntology | loadEntityGraph;
 }
 
 workflow loadDatasetSpecificAnnotationPropertiesAndGraphsEntry {
