@@ -3,22 +3,21 @@ nextflow.enable.dsl=2
 
 include { insertExternalDatabaseAndRelease } from './insertExternalDatabase.nf'
 
-webDisplaySpec = Channel.value(params.webDisplayOntologySpec);
-extDBRlsSpec = Channel.value(params.extDbRlsSpec);
+webDisplaySpec = Channel.value(params.webDisplayOntologySpec)
+extDBRlsSpec = Channel.value(params.extDbRlsSpec)
 
  if(params.isaFormat == "simple") {
 
      if(params.optionalDateObfuscationFile != "NA") {
-         file(params.optionalDateObfuscationFile, checkIfExists: true);
+         file(params.optionalDateObfuscationFile, checkIfExists: true)
      }
 
      if(params.optionalValueMappingFile != "NA") {
          file(params.optionalValueMappingFile, checkIfExists: true)
      }
 
-     if(params.optionalOntologyMappingOverrideBaseName != "NA") {
-         params.internalOntologyMappingOverrideFile = params.studyDirectory + "/" + params.optionalOntologyMappingOverrideBaseName
-         file(params.internalOntologyMappingOverrideFile, checkIfExists: true);
+     if(params.optionalOntologyMappingOverrideFile != "NA") {
+         file(params.optionalOntologyMappingOverrideFile, checkIfExists: true)
      }
  }
  else if(params.isaFormat == "isatab") { } // nothing to see here
@@ -28,7 +27,7 @@ extDBRlsSpec = Channel.value(params.extDbRlsSpec);
  }
 
  if(params.optionalMegaStudyYaml != "NA") {
-    file(params.optionalMegaStudyYaml, checkIfExists: true);
+    file(params.optionalMegaStudyYaml, checkIfExists: true)
  }
 
 
@@ -163,12 +162,12 @@ workflow loadEntityGraph {
 
     main:
 
-    def (databaseName, databaseVersion) = params.extDbRlsSpec.split("\\|");
+    def (databaseName, databaseVersion) = params.extDbRlsSpec.split("\\|")
 
-    extDbRlsOut = insertExternalDatabaseAndRelease(tuple databaseName, databaseVersion);
+    extDbRlsOut = insertExternalDatabaseAndRelease(tuple databaseName, databaseVersion)
 
-    entityGraphOut = insertEntityTypeGraph(extDBRlsSpec, webDisplaySpec, extDbRlsOut, initOntologyOut);
-    attributesOut = loadAttributesAndValues(extDBRlsSpec, webDisplaySpec, entityGraphOut);
+    entityGraphOut = insertEntityTypeGraph(extDBRlsSpec, webDisplaySpec, extDbRlsOut, initOntologyOut)
+    attributesOut = loadAttributesAndValues(extDBRlsSpec, webDisplaySpec, entityGraphOut)
 
     emit:
     attributesOut
@@ -181,12 +180,12 @@ workflow loadDatasetSpecificAnnotationPropertiesAndGraphs {
 
     main:
 
-    annPropOut = Channel.value("READY!");
+    annPropOut = Channel.value("READY!")
     if(params.optionalAnnotationPropertiesFile != "NA") {
-        annPropOut = loadAnnotationProperties(extDBRlsSpec, entityGraphOut);
+        annPropOut = loadAnnotationProperties(extDBRlsSpec, entityGraphOut)
     }
 
-    graphsOut = loadEntityTypeAndAttributeGraphs(extDBRlsSpec, webDisplaySpec, annPropOut);
+    graphsOut = loadEntityTypeAndAttributeGraphs(extDBRlsSpec, webDisplaySpec, annPropOut)
     datasetTablesOut = loadDatasetSpecificTables(extDBRlsSpec, webDisplaySpec, graphsOut)
 
 
