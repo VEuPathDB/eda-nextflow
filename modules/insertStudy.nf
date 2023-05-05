@@ -181,7 +181,7 @@ workflow loadDatasetSpecificAnnotationPropertiesAndGraphs {
     main:
 
     annPropOut = Channel.value("READY!")
-    if(params.optionalAnnotationPropertiesFile != "NA") {
+    if(params.optionalAnnotationPropertiesFile != "NA" && file(params.optionalAnnotationPropertiesFile).exists()) {
         annPropOut = loadAnnotationProperties(extDBRlsSpec, entityGraphOut)
     }
 
