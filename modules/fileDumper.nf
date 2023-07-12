@@ -1,14 +1,18 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
 
+webDisplayOntologySpec = Channel.value(params.webDisplayOntologySpec)
+extDbRlsSpec = Channel.value(params.extDbRlsSpec)
+
 process makeDownloadFiles {
     input:
     val extDbRlsSpec
     val webDisplayOntologySpec
+    stdin
+
 
     output:
-    val extDbRlsSpec
-    val webDisplayOntologySpec
+    stdout
 
     script:
     template 'makeDownloadFiles.bash'
@@ -17,16 +21,13 @@ process makeDownloadFiles {
     """
     echo "make download files"
     """
-
-
 }
 
 workflow dumpFiles {
     take:
-    extDbRlsSpec
-    webDisplayOntologySpec
+    datasetTablesOut
 
     main:
-    makeDownloadFiles(extDbRlsSpec, webDisplayOntologySpec)
+    makeDownloadFiles(datasetTablesOut, extDBRlsSpec, webDisplaySpec)
     // TODO:  binary files for scalability
 }
