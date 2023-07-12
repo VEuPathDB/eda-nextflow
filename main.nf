@@ -28,7 +28,7 @@ include { dumpFiles } from './modules/fileDumper.nf'
 // Main workflow
 //---------------------------------------------------------------------------------
 workflow {
-    loadInitialOntology | loadEntityGraph | loadDatasetSpecificAnnotationPropertiesAndGraphs
+    loadInitialOntology | loadEntityGraph | loadDatasetSpecificAnnotationPropertiesAndGraphs | dumpFiles
 }
 
 workflow loadEntityGraphEntry {
@@ -37,4 +37,8 @@ workflow loadEntityGraphEntry {
 
 workflow loadDatasetSpecificAnnotationPropertiesAndGraphsEntry {
     loadDatasetSpecificAnnotationPropertiesAndGraphs(Channel.value("READY!"));
+}
+
+workflow dumpFiles
+  dumpFiles(Channel.value("READY!"));
 }
