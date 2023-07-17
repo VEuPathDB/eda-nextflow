@@ -14,8 +14,16 @@ if [ "$params.investigationSubset" != "NA" ] ; then
   internalInvestigationSubset="--investigationSubset $params.investigationSubset";
 fi
 
-if [ "$params.useOntologyTermTableForTaxonTerms" = true ] ; then
+if [ "$params.useOntologyTermTableForTaxonTerms" == true ] ; then
     internalUseOntologyTermTableForTaxonTerms="--useOntologyTermTableForTaxonTerms";
+fi
+
+if [ "$params.loadProtocolTypeAsVariable" == true ] ; then
+    internalLoadProtocolTypeAsVariable="--loadProtocolTypeAsVariable";
+fi
+
+if [ "$params.investigationSubset" != "NA" ] ; then
+  internalProtocolSourceId="--protocolSourceId $params.protocolSourceId";
 fi
 
 # two commas here makes string lower case
@@ -37,7 +45,7 @@ if [ "$params.isaFormat" == "simple" ] ; then
     fi
 fi
 
-ga ApiCommonData::Load::Plugin::InsertEntityGraph \$internalUseOntologyTermTableForTaxonTerms \$internalInvestigationSubset \$internalUseIsaSimpleParser \$internalOntologyMappingFile \$internalDateObfuscationFile \$internalValueMappingFile \$internalOntologyMappingOverrideFile \\
+ga ApiCommonData::Load::Plugin::InsertEntityGraph \$internalLoadProtocolTypeAsVariable \$internalProtocolSourceId \$internalUseOntologyTermTableForTaxonTerms \$internalInvestigationSubset \$internalUseIsaSimpleParser \$internalOntologyMappingFile \$internalDateObfuscationFile \$internalValueMappingFile \$internalOntologyMappingOverrideFile \\
   --commit \\
   --extDbRlsSpec \'$extDbRlsSpec\' \\
   --investigationBaseName $params.investigationBaseName \\
