@@ -22,8 +22,8 @@ if [ "$params.loadProtocolTypeAsVariable" == true ] ; then
     internalLoadProtocolTypeAsVariable="--loadProtocolTypeAsVariable";
 fi
 
-if [ "$params.investigationSubset" != "NA" ] ; then
-  internalProtocolSourceId="--protocolSourceId $params.protocolSourceId";
+if [ "$params.protocolVariableSourceId" != "NA" ] ; then
+  internalProtocolVariableSourceId="--protocolVariableSourceId $params.protocolVariableSourceId";
 fi
 
 # two commas here makes string lower case
@@ -45,7 +45,7 @@ if [ "$params.isaFormat" == "simple" ] ; then
     fi
 fi
 
-ga ApiCommonData::Load::Plugin::InsertEntityGraph \$internalLoadProtocolTypeAsVariable \$internalProtocolSourceId \$internalUseOntologyTermTableForTaxonTerms \$internalInvestigationSubset \$internalUseIsaSimpleParser \$internalOntologyMappingFile \$internalDateObfuscationFile \$internalValueMappingFile \$internalOntologyMappingOverrideFile \\
+ga ApiCommonData::Load::Plugin::InsertEntityGraph \$internalLoadProtocolTypeAsVariable \$internalProtocolVariableSourceId \$internalUseOntologyTermTableForTaxonTerms \$internalInvestigationSubset \$internalUseIsaSimpleParser \$internalOntologyMappingFile \$internalDateObfuscationFile \$internalValueMappingFile \$internalOntologyMappingOverrideFile \\
   --commit \\
   --extDbRlsSpec \'$extDbRlsSpec\' \\
   --investigationBaseName $params.investigationBaseName \\
