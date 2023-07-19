@@ -36,6 +36,7 @@ process makeBinaryFiles {
     singularity exec --bind $GUS_HOME/config/gus.config:/project/gus.config --bind $params.resultsDirectory:/data  docker://veupathdb/tool-eda-file-dumper:latest dumpFiles ${studies[0]} /data /project/gus.config 
     """
 
+
     stub:
     """
     echo "make binary files"
