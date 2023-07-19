@@ -5,6 +5,8 @@ webDisplayOntologySpec = Channel.value(params.webDisplayOntologySpec)
 extDbRlsSpec = Channel.value(params.extDbRlsSpec)
 
 process makeDownloadFiles {
+    publishDir "$params.resultsDirectory", pattern: "*.txt", mode: "copy" 
+
     input:
     stdin
     val extDbRlsSpec
@@ -27,15 +29,16 @@ process makeDownloadFiles {
 process makeBinaryFiles {
     input:
     stdin
+    val studies    
 
     script:
     """
-    singularity exec --bind $GUS_HOME/config/gus.config:/project/gus.config --bind ${launchDir}/forDownloads:/data  docker://veupathdb/tool-eda-file-dumper:latest dumpFiles 'TODO_STUDY_NAME' /data /project/gus.config 
+    singularity exec --bind $GUS_HOME/config/gus.config:/project/gus.config --bind $params.resultsDirectory:/data  docker://veupathdb/tool-eda-file-dumper:latest dumpFiles ${studies[0]} /data /project/gus.config 
     """
 
     stub:
     """
-    echo "make download files"
+    echo "make binary files"
     """
 }
 
@@ -46,9 +49,9 @@ workflow dumpFiles {
     datasetTablesOut
 
     main:
-
-//    makeDownloadFiles(datasetTablesOut, extDbRlsSpec, webDisplayOntologySpec)
-    makeBinaryFiles(datasetTablesOut);
+    results =  makeDownloadFiles(datasetTablesOut, extDbRlsSpec, webDisplayOntologySpec)
+    studies = results.flatten().filter( ~/.*Studies.txt$/).splitCsv(header:false, sep:"\t", by:1)
+    makeBinaryFiles(datasetTablesOut, studies);
     
 
 }
