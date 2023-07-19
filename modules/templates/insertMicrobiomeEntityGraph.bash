@@ -12,7 +12,15 @@ if [ -e $params.optionalOntologyMappingOverrideFile ]; then
   internalOntologyMappingOverrideFile="--ontologyMappingOverrideFile ${params.optionalOntologyMappingOverrideFile}"
 fi
 
-ga ApiCommonData::Load::Plugin::MBioInsertEntityGraph \$internalOntologyMappingOverrideFile \$internalValueMappingFile \\
+if [ "$params.isRelativeAbundance" == true ] ; then
+    internalIsRelativeAbundance="--isRelativeAbundance";
+fi
+
+
+if [ params.
+
+
+ga ApiCommonData::Load::Plugin::MBioInsertEntityGraph \$internalOntologyMappingOverrideFile \$internalValueMappingFile \$internalIsRelativeAbundance \\
   --commit \\
   --investigationFile "${params.studyDirectory}/${params.investigationBaseName}" \\
   --sampleDetailsFile "${params.studyDirectory}/${params.sampleDetailsFile}" \\
