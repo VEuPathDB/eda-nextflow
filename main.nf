@@ -36,7 +36,7 @@ workflow loadEntityGraphEntry {
 }
 
 workflow loadDatasetSpecificAnnotationPropertiesAndGraphsEntry {
-    loadDatasetSpecificAnnotationPropertiesAndGraphs(Channel.value("READY!")) | fileDumper;
+    loadDatasetSpecificAnnotationPropertiesAndGraphs(Channel.value("READY!")) | dumpFiles
 }
 
 workflow fileDumper {
