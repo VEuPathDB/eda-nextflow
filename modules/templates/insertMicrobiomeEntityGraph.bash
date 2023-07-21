@@ -12,13 +12,10 @@ if [ -e $params.optionalOntologyMappingOverrideFile ]; then
   internalOntologyMappingOverrideFile="--ontologyMappingOverrideFile ${params.optionalOntologyMappingOverrideFile}"
 fi
 
+internalIsRelativeAbundance="";
 if [ "$params.isRelativeAbundance" == true ] ; then
     internalIsRelativeAbundance="--isRelativeAbundance";
 fi
-
-
-if [ params.
-
 
 ga ApiCommonData::Load::Plugin::MBioInsertEntityGraph \$internalOntologyMappingOverrideFile \$internalValueMappingFile \$internalIsRelativeAbundance \\
   --commit \\
