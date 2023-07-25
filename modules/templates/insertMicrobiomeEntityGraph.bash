@@ -26,6 +26,7 @@ ga ApiCommonData::Load::Plugin::MBioInsertEntityGraph \$internalOntologyMappingO
   --dieOnFirstError 1 \\
   --ontologyMappingFile $params.webDisplayOntologyFile \\
   --extDbRlsSpec \'$extDbRlsSpec\' \\
-  --schema $params.schema
+  --schema $params.schema \\
+  --useOntologyTermTableForTaxonTerms 1
 
 echo "DONE" 
