@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+internalCollectionsYaml="";
+
 if [ "$params.optionalCollectionsYaml" != "NA" ] ; then
   internalCollectionsYaml="--collectionsYaml $params.optionalCollectionsYaml";
 fi

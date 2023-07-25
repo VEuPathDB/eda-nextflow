@@ -9,6 +9,8 @@ internalDateObfuscationFile="";
 internalValueMappingFile="";
 internalOntologyMappingOverrideFile="";
 internalInvestigationSubset="";
+internalLoadProtocolTypeAsVariable="";
+internalProtocolVariableSourceId="";
 
 if [ "$params.investigationSubset" != "NA" ] ; then
   internalInvestigationSubset="--investigationSubset $params.investigationSubset";
