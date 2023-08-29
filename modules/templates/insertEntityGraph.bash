@@ -31,7 +31,7 @@ if [ "$params.protocolVariableSourceId" != "NA" ] ; then
 fi
 
 if [ "$params.optionalGadmDataDirectory"   != "NA" ] &&  [ "${params.optionalGadmSocketDirectory}" != "NA" ] && [ "${params.optionalGadmPort}" != "NA" ]; then
-    internalGadmDsn="--gadmDsn dbi:Pg:host=${params.optionalGadmSocketDirectory};port=${params.optionalGadmPort}"
+    internalGadmDsn="--gadmDsn dbi:Pg:database=gadm;host=${params.optionalGadmSocketDirectory};port=${params.optionalGadmPort}"
     singularity instance start --bind ${params.optionalGadmSocketDirectory}:/var/run/postgresql --bind ${params.optionalGadmDataDirectory}:/var/lib/postgresql/ \$POSTGRES_IMAGE $workflow.runName
 
     APPTAINER_PGDATA=/var/lib/postgresql/data APPTAINERENV_PGPORT=${params.optionalGadmPort} APPTAINERENV_POSTGRES_PASSWORD=mypass singularity run instance://${workflow.runName} -p ${params.optionalGadmPort} & pid=\$!
