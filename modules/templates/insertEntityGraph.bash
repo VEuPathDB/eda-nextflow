@@ -7,6 +7,7 @@ cleanup() {
     singularity exec instance://${workflow.runName} pg_ctl stop -D /var/lib/postgresql/data -m smart
     singularity instance stop ${workflow.runName}
   fi
+  exit 1;
 }
 
 # Trap the ERR signal and run the cleanup function
