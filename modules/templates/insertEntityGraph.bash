@@ -2,6 +2,16 @@
 
 set -euo pipefail
 
+cleanup() {
+  if [ "$params.optionalGadmDataDirectory"   != "NA" ] &&  [ "${params.optionalGadmSocketDirectory}" != "NA" ] && [ "${params.optionalGadmPort}" != "NA" ]; then
+    singularity exec instance://${workflow.runName} pg_ctl stop -D /var/lib/postgresql/data -m smart
+    singularity instance stop ${workflow.runName}
+  fi
+}
+
+# Trap the ERR signal and run the cleanup function
+trap 'cleanup' ERR
+
 POSTGRES_IMAGE="docker://postgis/postgis:15-3.4";
 internalGadmDsn="";
 internalUseOntologyTermTableForTaxonTerms="";
@@ -66,8 +76,7 @@ ga ApiCommonData::Load::Plugin::InsertEntityGraph \$internalLoadProtocolTypeAsVa
   --schema $params.schema
 
 if [ "$params.optionalGadmDataDirectory"   != "NA" ] &&  [ "${params.optionalGadmSocketDirectory}" != "NA" ] && [ "${params.optionalGadmPort}" != "NA" ]; then
-  singularity exec instance://${workflow.runName} pg_ctl stop -D /var/lib/postgresql/data -m smart
-  singularity instance stop ${workflow.runName}
+   cleanup
 fi
 
 
