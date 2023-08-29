@@ -3,7 +3,7 @@
 set -euo pipefail
 
 POSTGRES_IMAGE="docker://postgis/postgis:15-3.4";
-
+internalGadmDsn="";
 internalUseOntologyTermTableForTaxonTerms="";
 internalUseIsaSimpleParser="";
 internalOntologyMappingFile="";
