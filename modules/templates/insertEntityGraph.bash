@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+POSTGRES_IMAGE="docker://postgis/postgis:15-3.4";
+
 internalUseOntologyTermTableForTaxonTerms="";
 internalUseIsaSimpleParser="";
 internalOntologyMappingFile="";
@@ -28,6 +30,15 @@ if [ "$params.protocolVariableSourceId" != "NA" ] ; then
   internalProtocolVariableSourceId="--protocolVariableSourceId $params.protocolVariableSourceId";
 fi
 
+if [ "$params.optionalGadmDataDirectory"   != "NA" ] &&  [ "${params.optionalGadmSocketDirectory}" != "NA" ] && [ "${params.optionalGadmPort}" != "NA" ]; then
+    internalGadmDsn="--gadmDsn dbi:Pg:host=${params.optionalGadmSocketDirectory};port=${params.optionalGadmPort}"
+    singularity instance start --bind ${params.optionalGadmSocketDirectory}:/var/run/postgresql --bind ${params.optionalGadmDataDirectory}:/var/lib/postgresql/ \$POSTGRES_IMAGE $workflow.runName
+
+    APPTAINER_PGDATA=/var/lib/postgresql/data APPTAINERENV_PGPORT=${params.optionalGadmPort} APPTAINERENV_POSTGRES_PASSWORD=mypass singularity run instance://${workflow.runName} -p ${params.optionalGadmPort} & pid=\$!
+    timeout 90s bash -c "until singularity exec instance://${workflow.runName} pg_isready -p ${params.optionalGadmPort}; do sleep 5 ; done;"
+fi
+
+
 # two commas here makes string lower case
 if [ "$params.isaFormat" == "simple" ] ; then
     internalInvestigationFile="${params.studyDirectory}/${params.investigationBaseName}";
@@ -47,16 +58,21 @@ if [ "$params.isaFormat" == "simple" ] ; then
     fi
 fi
 
-ga ApiCommonData::Load::Plugin::InsertEntityGraph \$internalLoadProtocolTypeAsVariable \$internalProtocolVariableSourceId \$internalUseOntologyTermTableForTaxonTerms \$internalInvestigationSubset \$internalUseIsaSimpleParser \$internalOntologyMappingFile \$internalDateObfuscationFile \$internalValueMappingFile \$internalOntologyMappingOverrideFile \\
+ga ApiCommonData::Load::Plugin::InsertEntityGraph \$internalLoadProtocolTypeAsVariable \$internalProtocolVariableSourceId \$internalUseOntologyTermTableForTaxonTerms \$internalInvestigationSubset \$internalUseIsaSimpleParser \$internalOntologyMappingFile \$internalDateObfuscationFile \$internalValueMappingFile \$internalOntologyMappingOverrideFile \$internalGadmDsn \\
   --commit \\
   --extDbRlsSpec \'$extDbRlsSpec\' \\
   --investigationBaseName $params.investigationBaseName \\
   --metaDataRoot $params.studyDirectory \\
   --schema $params.schema
 
-  if [ \'$params.speciesReconciliationOntologySpec\' != "NA" ]; then
-    reconcilePopBioSpecies.pl --fallbackSpecies \'$params.speciesReconciliationFallbackSpecies\' --veupathOntologySpec \'$params.speciesReconciliationOntologySpec\' --extDbRlsSpec \'$extDbRlsSpec\'
-  fi
+if [ "$params.optionalGadmDataDirectory"   != "NA" ] &&  [ "${params.optionalGadmSocketDirectory}" != "NA" ] && [ "${params.optionalGadmPort}" != "NA" ]; then
+  singularity exec instance://${workflow.runName} pg_ctl stop -D /var/lib/postgresql/data -m smart
+  singularity instance stop ${workflow.runName}
+fi
 
+
+if [ \'$params.speciesReconciliationOntologySpec\' != "NA" ]; then
+  reconcilePopBioSpecies.pl --fallbackSpecies \'$params.speciesReconciliationFallbackSpecies\' --veupathOntologySpec \'$params.speciesReconciliationOntologySpec\' --extDbRlsSpec \'$extDbRlsSpec\'
+fi
 
 echo "DONE";
