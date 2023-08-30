@@ -2,11 +2,16 @@
 
 set -euo pipefail
 
-cleanup() {
+
+stopSingularityInstance() {
   if [ "$params.optionalGadmDataDirectory"   != "NA" ] &&  [ "${params.optionalGadmSocketDirectory}" != "NA" ] && [ "${params.optionalGadmPort}" != "NA" ]; then
     singularity exec instance://${workflow.runName} pg_ctl stop -D /var/lib/postgresql/data -m smart
     singularity instance stop ${workflow.runName}
   fi
+}
+
+cleanup() {
+  stopSingularityInstance
   exit 1;
 }
 
@@ -76,9 +81,8 @@ ga ApiCommonData::Load::Plugin::InsertEntityGraph \$internalLoadProtocolTypeAsVa
   --metaDataRoot $params.studyDirectory \\
   --schema $params.schema
 
-if [ "$params.optionalGadmDataDirectory"   != "NA" ] &&  [ "${params.optionalGadmSocketDirectory}" != "NA" ] && [ "${params.optionalGadmPort}" != "NA" ]; then
-   cleanup
-fi
+stopSingularityInstance
+
 
 
 if [ \'$params.speciesReconciliationOntologySpec\' != "NA" ]; then
