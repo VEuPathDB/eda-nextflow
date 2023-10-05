@@ -2,7 +2,13 @@
 
 set -euo pipefail
 
-ga ApiCommonData::Load::Plugin::LoadEntityTypeAndAttributeGraphs \\
+internalNoCommonDef="";
+
+if [ "$params.noCommonDef" == "true" ]; then
+  internalNoCommonDef="--noCommonDef";
+fi
+
+ga ApiCommonData::Load::Plugin::LoadEntityTypeAndAttributeGraphs \$internalNoCommonDef \\
     --logDir \$PWD \\
     --extDbRlsSpec \'$extDbRlsSpec\' \\
     --ontologyExtDbRlsSpec \'$webDisplayOntologySpec\' \\
