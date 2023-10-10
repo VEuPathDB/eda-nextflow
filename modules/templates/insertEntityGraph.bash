@@ -3,8 +3,10 @@
 set -euo pipefail
 
 
+gadmSocket=gadmSocket
+
 if [ "$params.optionalGadmDataDirectory"   != "NA" ] &&  [ "${params.optionalGadmSocketDirectory}" != "NA" ] && [ "${params.optionalGadmPort}" != "NA" ]; then
-  ln -s ${params.optionalGadmSocketDirectory} gadmSocket
+  ln -s ${params.optionalGadmSocketDirectory} \$gadmSocket
 fi
 
 stopSingularityInstance() {
