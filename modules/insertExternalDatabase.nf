@@ -6,6 +6,7 @@ process insertExternalDatabaseAndRelease {
 
     input:
     tuple val(databaseName), val(databaseVersion)
+    stdin
 
     output:
     stdout

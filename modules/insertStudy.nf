@@ -164,7 +164,7 @@ workflow loadEntityGraph {
 
     def (databaseName, databaseVersion) = params.extDbRlsSpec.split("\\|")
 
-    extDbRlsOut = insertExternalDatabaseAndRelease(tuple databaseName, databaseVersion)
+    extDbRlsOut = insertExternalDatabaseAndRelease(tuple(databaseName, databaseVersion), initOntologyOut)
 
     entityGraphOut = insertEntityTypeGraph(extDBRlsSpec, webDisplaySpec, extDbRlsOut, initOntologyOut)
     attributesOut = loadAttributesAndValues(extDBRlsSpec, webDisplaySpec, entityGraphOut)
@@ -185,7 +185,9 @@ workflow loadDatasetSpecificAnnotationPropertiesAndGraphs {
         annPropOut = loadAnnotationProperties(extDBRlsSpec, entityGraphOut)
     }
 
-    graphsOut = loadEntityTypeAndAttributeGraphs(extDBRlsSpec, webDisplaySpec, annPropOut)
+
+
+    graphsOut = loadEntityTypeAndAttributeGraphs(extDBRlsSpec, webDisplaySpec, entityGraphOut.combine(annPropOut))
     datasetTablesOut = loadDatasetSpecificTables(extDBRlsSpec, webDisplaySpec, graphsOut)
 
 

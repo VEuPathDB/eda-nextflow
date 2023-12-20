@@ -36,6 +36,11 @@ internalInvestigationSubset="";
 internalLoadProtocolTypeAsVariable="";
 internalProtocolVariableSourceId="";
 
+internalGusConfigFile="";
+if [ "$params.gusConfigFile" != "NA" ] ; then
+  internalGusConfigFile="--gusConfigFile $params.gusConfigFile";
+fi
+
 if [ "$params.investigationSubset" != "NA" ] ; then
   internalInvestigationSubset="--investigationSubset $params.investigationSubset";
 fi
@@ -80,7 +85,7 @@ if [ "$params.isaFormat" == "simple" ] ; then
     fi
 fi
 
-ga ApiCommonData::Load::Plugin::InsertEntityGraph \$internalLoadProtocolTypeAsVariable \$internalProtocolVariableSourceId \$internalUseOntologyTermTableForTaxonTerms \$internalInvestigationSubset \$internalUseIsaSimpleParser \$internalOntologyMappingFile \$internalDateObfuscationFile \$internalValueMappingFile \$internalOntologyMappingOverrideFile \$internalGadmDsn \\
+ga ApiCommonData::Load::Plugin::InsertEntityGraph \$internalGusConfigFile \$internalLoadProtocolTypeAsVariable \$internalProtocolVariableSourceId \$internalUseOntologyTermTableForTaxonTerms \$internalInvestigationSubset \$internalUseIsaSimpleParser \$internalOntologyMappingFile \$internalDateObfuscationFile \$internalValueMappingFile \$internalOntologyMappingOverrideFile \$internalGadmDsn \\
   --commit \\
   --extDbRlsSpec \'$extDbRlsSpec\' \\
   --investigationBaseName $params.investigationBaseName \\

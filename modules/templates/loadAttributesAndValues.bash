@@ -4,10 +4,16 @@ set -euo pipefail
 
 internalRunRLocally="";
 if [ "$params.schema" == "ApidbUserDatasets" ] ; then
-    internalRunRLocally="--runRLocally";
+    internalRunRLocally="--runStatsScriptLocally";
 fi
 
-ga ApiCommonData::Load::Plugin::LoadAttributesFromEntityGraph \$internalRunRLocally \\
+internalGusConfigFile="";
+if [ "$params.gusConfigFile" != "NA" ] ; then
+  internalGusConfigFile="--gusConfigFile $params.gusConfigFile";
+fi
+
+
+ga ApiCommonData::Load::Plugin::LoadAttributesFromEntityGraph \$internalRunRLocally \$internalGusConfigFile \\
     --logDir \$PWD \\
     --extDbRlsSpec \'$extDbRlsSpec\' \\
     --ontologyExtDbRlsSpec \'$webDisplayOntologySpec\' \\

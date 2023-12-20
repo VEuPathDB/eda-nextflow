@@ -2,11 +2,24 @@
 
 set -euo pipefail
 
-ga GUS::Supported::Plugin::InsertExternalDatabase \\
+internalGusConfigFile="";
+if [ "$params.gusConfigFile" != "NA" ] ; then
+  internalGusConfigFile="--gusConfigFile $params.gusConfigFile";
+fi
+
+
+insertExternalDatabasePlugin="GUS::Supported::Plugin::InsertExternalDatabase";
+insertExternalDatabaseReleasePlugin="GUS::Supported::Plugin::InsertExternalDatabaseRls";
+if [ "$params.schema" == "ApidbUserDatasets" ] ; then
+    insertExternalDatabasePlugin=ApiCommonData::Load::Plugin::InsertExternalDatabaseUD
+    insertExternalDatabaseReleasePlugin=ApiCommonData::Load::Plugin::InsertExternalDatabaseRlsUD
+fi
+
+ga \$insertExternalDatabasePlugin \$internalGusConfigFile \\
 --name $databaseName \\
 --commit;
 
-ga GUS::Supported::Plugin::InsertExternalDatabaseRls \\
+ga \$insertExternalDatabaseReleasePlugin \$internalGusConfigFile \\
 --databaseName $databaseName \\
 --databaseVersion $databaseVersion \\
 --commit;
