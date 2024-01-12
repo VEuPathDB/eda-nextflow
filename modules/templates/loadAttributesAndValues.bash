@@ -20,4 +20,14 @@ ga ApiCommonData::Load::Plugin::LoadAttributesFromEntityGraph \$internalRunRLoca
     --schema $params.schema \\
     --commit
 
+
+
+# Check if any .cache files were found. if not make empty
+cache_files=\$(find . -maxdepth 1 -type f -name "*.cache")
+if [ -z "\$cache_files" ]; then
+    # No .txt files found, create a file named empty.txt.
+    touch empty.cache
+fi
+
+
 echo "DONE"

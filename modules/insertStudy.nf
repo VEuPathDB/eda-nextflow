@@ -65,7 +65,9 @@ process insertEntityTypeGraph {
 
 }
 
+// If we are in user datasets mode, the attribute value tables will be written to files
 process loadAttributesAndValues {
+    publishDir "$params.resultsDirectory", pattern: '*.{cache}', mode: "copy"
     tag "plugin"
 
     input:
@@ -74,10 +76,10 @@ process loadAttributesAndValues {
     stdin
 
     output:
-    stdout
+    stdout emit: verbiage
+    path "*.cache"
 
     script:
-
     template 'loadAttributesAndValues.bash'
 
 
@@ -87,6 +89,7 @@ process loadAttributesAndValues {
     """
 
 }
+
 
 process loadEntityTypeAndAttributeGraphs {
     tag "plugin"
@@ -167,7 +170,7 @@ workflow loadEntityGraph {
     extDbRlsOut = insertExternalDatabaseAndRelease(tuple(databaseName, databaseVersion), initOntologyOut)
 
     entityGraphOut = insertEntityTypeGraph(extDBRlsSpec, webDisplaySpec, extDbRlsOut, initOntologyOut)
-    attributesOut = loadAttributesAndValues(extDBRlsSpec, webDisplaySpec, entityGraphOut)
+    attributesOut = loadAttributesAndValues(extDBRlsSpec, webDisplaySpec, entityGraphOut).verbiage
 
     emit:
     attributesOut
@@ -185,11 +188,8 @@ workflow loadDatasetSpecificAnnotationPropertiesAndGraphs {
         annPropOut = loadAnnotationProperties(extDBRlsSpec, entityGraphOut)
     }
 
-
-
     graphsOut = loadEntityTypeAndAttributeGraphs(extDBRlsSpec, webDisplaySpec, entityGraphOut.combine(annPropOut))
     datasetTablesOut = loadDatasetSpecificTables(extDBRlsSpec, webDisplaySpec, graphsOut)
-
 
     emit:
     datasetTablesOut

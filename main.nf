@@ -22,7 +22,7 @@ if(params.webDisplayOntologyFile != "NA" && params.schema != 'ApidbUserDatasets'
 //---------------------------------------------------------------------------------
 include { loadInitialOntology; loadOntologyFromTabDelim } from './modules/insertOntologyTerms.nf'
 include { loadEntityGraph; loadDatasetSpecificAnnotationPropertiesAndGraphs } from './modules/insertStudy.nf'
-include { dumpFiles } from './modules/fileDumper.nf'
+include { dumpFiles; dumpUserDatasetFiles } from './modules/fileDumper.nf'
 include { unpack } from './modules/unpack.nf'
 
 //---------------------------------------------------------------------------------
@@ -45,6 +45,7 @@ workflow fileDumper {
 }
 
 workflow loadUserDataset {
-    unpack | loadOntologyFromTabDelim | loadEntityGraph | loadDatasetSpecificAnnotationPropertiesAndGraphs
+    unpack | loadOntologyFromTabDelim | loadEntityGraph | loadDatasetSpecificAnnotationPropertiesAndGraphs | dumpUserDatasetFiles
     //loadDatasetSpecificAnnotationPropertiesAndGraphs(Channel.value("READY!"));
 }
+
