@@ -23,7 +23,7 @@ if(params.webDisplayOntologyFile != "NA" && params.schema != 'ApidbUserDatasets'
 include { loadInitialOntology; loadOntologyFromTabDelim } from './modules/insertOntologyTerms.nf'
 include { loadEntityGraph; loadDatasetSpecificAnnotationPropertiesAndGraphs } from './modules/insertStudy.nf'
 include { dumpFiles; dumpUserDatasetFiles } from './modules/fileDumper.nf'
-include { unpack } from './modules/unpack.nf'
+include { unpack; unpackBiom } from './modules/unpack.nf'
 
 //---------------------------------------------------------------------------------
 // Main workflow
@@ -49,3 +49,8 @@ workflow loadUserDataset {
     //loadDatasetSpecificAnnotationPropertiesAndGraphs(Channel.value("READY!"));
 }
 
+
+workflow loadBiomUserDataset {
+    //unpack | loadOntologyFromTabDelim | loadEntityGraph | loadDatasetSpecificAnnotationPropertiesAndGraphs | dumpUserDatasetFiles
+    unpackBiom | loadOntologyFromTabDelim | loadEntityGraph | loadDatasetSpecificAnnotationPropertiesAndGraphs | dumpUserDatasetFiles
+}
