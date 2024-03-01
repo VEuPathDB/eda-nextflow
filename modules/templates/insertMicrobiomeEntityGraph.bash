@@ -17,12 +17,17 @@ if [ "$params.isRelativeAbundance" == true ] ; then
     internalIsRelativeAbundance="--isRelativeAbundance";
 fi
 
-ga ApiCommonData::Load::Plugin::MBioInsertEntityGraph \$internalOntologyMappingOverrideFile \$internalValueMappingFile \$internalIsRelativeAbundance \\
+internalGusConfigFile="";
+if [ "$params.gusConfigFile" != "NA" ] ; then
+  internalGusConfigFile="--gusConfigFile $params.gusConfigFile";
+fi
+
+ga ApiCommonData::Load::Plugin::MBioInsertEntityGraph \$internalOntologyMappingOverrideFile \$internalValueMappingFile \$internalIsRelativeAbundance \$internalGusConfigFile \\
   --commit \\
   --investigationFile "${params.studyDirectory}/${params.investigationBaseName}" \\
   --sampleDetailsFile "${params.studyDirectory}/${params.sampleDetailsFile}" \\
   --mbioResultsDir "${params.studyDirectory}/${params.assayResultsDirectory}" \\
-  --mbioResultsFileExtensions $params.assayResultsFileExtensionsJson \\
+  --mbioResultsFileExtensions "$params.assayResultsFileExtensionsJson" \\
   --dieOnFirstError 1 \\
   --ontologyMappingFile $params.webDisplayOntologyFile \\
   --extDbRlsSpec \'$extDbRlsSpec\' \\

@@ -12,7 +12,7 @@ else {
     throw new Exception("missing params.studyDirectory");
 }
 
-if(params.webDisplayOntologyFile != "NA") {
+if(params.webDisplayOntologyFile != "NA" && params.schema != 'ApidbUserDatasets') {
     file(params.webDisplayOntologyFile, checkIfExists: true)
 }
 
@@ -20,9 +20,10 @@ if(params.webDisplayOntologyFile != "NA") {
 //---------------------------------------------------------------------------------
 // Includes
 //---------------------------------------------------------------------------------
-include { loadInitialOntology } from './modules/insertOntologyTerms.nf'
+include { loadInitialOntology; loadOntologyFromTabDelim } from './modules/insertOntologyTerms.nf'
 include { loadEntityGraph; loadDatasetSpecificAnnotationPropertiesAndGraphs } from './modules/insertStudy.nf'
-include { dumpFiles } from './modules/fileDumper.nf'
+include { dumpFiles; dumpUserDatasetFiles } from './modules/fileDumper.nf'
+include { unpack; unpackBiom } from './modules/unpack.nf'
 
 //---------------------------------------------------------------------------------
 // Main workflow
@@ -41,4 +42,15 @@ workflow loadDatasetSpecificAnnotationPropertiesAndGraphsEntry {
 
 workflow fileDumper {
   dumpFiles(Channel.value("READY!"));
+}
+
+workflow loadUserDataset {
+    unpack | loadOntologyFromTabDelim | loadEntityGraph | loadDatasetSpecificAnnotationPropertiesAndGraphs | dumpUserDatasetFiles
+    //loadDatasetSpecificAnnotationPropertiesAndGraphs(Channel.value("READY!"));
+}
+
+
+workflow loadBiomUserDataset {
+    //unpack | loadOntologyFromTabDelim | loadEntityGraph | loadDatasetSpecificAnnotationPropertiesAndGraphs | dumpUserDatasetFiles
+    unpackBiom | loadOntologyFromTabDelim | loadEntityGraph | loadDatasetSpecificAnnotationPropertiesAndGraphs | dumpUserDatasetFiles
 }

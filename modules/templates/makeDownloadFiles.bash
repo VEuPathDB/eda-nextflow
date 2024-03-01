@@ -2,7 +2,12 @@
 
 set -euo pipefail
 
-ga ApiCommonData::Load::Plugin::MakeEntityDownloadFiles \\
+internalGusConfigFile="";
+if [ "$params.gusConfigFile" != "NA" ] ; then
+  internalGusConfigFile="--gusConfigFile $params.gusConfigFile";
+fi
+
+ga ApiCommonData::Load::Plugin::MakeEntityDownloadFiles \$internalGusConfigFile \\
   --commit \\
   --extDbRlsSpec \'$extDbRlsSpec\' \\
   --fileBasename $params.downloadFileBaseName \\

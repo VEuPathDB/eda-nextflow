@@ -8,7 +8,12 @@ if [ "$params.noCommonDef" == "true" ]; then
   internalNoCommonDef="--noCommonDef";
 fi
 
-ga ApiCommonData::Load::Plugin::LoadEntityTypeAndAttributeGraphs \$internalNoCommonDef \\
+internalGusConfigFile="";
+if [ "$params.gusConfigFile" != "NA" ] ; then
+  internalGusConfigFile="--gusConfigFile $params.gusConfigFile";
+fi
+
+ga ApiCommonData::Load::Plugin::LoadEntityTypeAndAttributeGraphs \$internalNoCommonDef \$internalGusConfigFile \\
     --logDir \$PWD \\
     --extDbRlsSpec \'$extDbRlsSpec\' \\
     --ontologyExtDbRlsSpec \'$webDisplayOntologySpec\' \\
