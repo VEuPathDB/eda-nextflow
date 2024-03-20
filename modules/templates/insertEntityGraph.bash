@@ -3,12 +3,6 @@
 set -euo pipefail
 
 
-gadmSocket=gadmSocket
-
-if [ "$params.optionalGadmDataDirectory"   != "NA" ] &&  [ "${params.optionalGadmSocketDirectory}" != "NA" ] && [ "${params.optionalGadmPort}" != "NA" ]; then
-  ln -s ${params.optionalGadmSocketDirectory} \$gadmSocket
-fi
-
 stopSingularityInstance() {
   if [ "$params.optionalGadmDataDirectory"   != "NA" ] &&  [ "${params.optionalGadmSocketDirectory}" != "NA" ] && [ "${params.optionalGadmPort}" != "NA" ]; then
     singularity exec instance://${workflow.runName} pg_ctl stop -D /var/lib/postgresql/data -m smart
@@ -58,8 +52,8 @@ if [ "$params.protocolVariableSourceId" != "NA" ] ; then
 fi
 
 if [ "$params.optionalGadmDataDirectory"   != "NA" ] &&  [ "${params.optionalGadmSocketDirectory}" != "NA" ] && [ "${params.optionalGadmPort}" != "NA" ]; then
-    internalGadmDsn="--gadmDsn dbi:Pg:database=gadm;host=\${gadmSocket};port=${params.optionalGadmPort}"
-    singularity instance start --bind \${gadmSocket}:/var/run/postgresql --bind ${params.optionalGadmDataDirectory}:/var/lib/postgresql/data \$POSTGRES_IMAGE $workflow.runName
+    internalGadmDsn="--gadmDsn dbi:Pg:database=gadm;host=${params.optionalGadmSocketDirectory};port=${params.optionalGadmPort}"
+    singularity instance start --bind ${params.optionalGadmSocketDirectory}:/var/run/postgresql --bind ${params.optionalGadmDataDirectory}:/var/lib/postgresql/data \$POSTGRES_IMAGE $workflow.runName
 
     APPTAINER_PGDATA=/var/lib/postgresql/data APPTAINERENV_PGPORT=${params.optionalGadmPort} APPTAINERENV_POSTGRES_PASSWORD=mypass singularity run instance://${workflow.runName} -p ${params.optionalGadmPort} & pid=\$!
     timeout 90s bash -c "until singularity exec instance://${workflow.runName} pg_isready -p ${params.optionalGadmPort}; do sleep 5 ; done;"

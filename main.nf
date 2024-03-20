@@ -24,6 +24,7 @@ include { loadInitialOntology; loadOntologyFromTabDelim } from './modules/insert
 include { loadEntityGraph; loadDatasetSpecificAnnotationPropertiesAndGraphs } from './modules/insertStudy.nf'
 include { dumpFiles; dumpUserDatasetFiles } from './modules/fileDumper.nf'
 include { unpack; unpackBiom } from './modules/unpack.nf'
+include { loadPopsetEntityGraph } from './modules/popset.nf'
 
 //---------------------------------------------------------------------------------
 // Main workflow
@@ -39,6 +40,12 @@ workflow loadEntityGraphEntry {
 workflow loadDatasetSpecificAnnotationPropertiesAndGraphsEntry {
     loadDatasetSpecificAnnotationPropertiesAndGraphs(Channel.value("READY!")) | dumpFiles
 }
+
+workflow popsetEntry {
+    loadInitialOntology | loadPopsetEntityGraph | loadDatasetSpecificAnnotationPropertiesAndGraphs | dumpFiles
+
+}
+  
 
 workflow fileDumper {
   dumpFiles(Channel.value("READY!"));
