@@ -2,14 +2,18 @@
 nextflow.enable.dsl=2
 
 include { loadAttributesAndValues } from './insertStudy.nf'
+include { insertExternalDatabaseAndRelease } from './insertExternalDatabase.nf'
+
+webDisplaySpec = Channel.value(params.webDisplayOntologySpec)
+extDBRlsSpec = Channel.value(params.extDbRlsSpec)
 
 process getQueryResult {
   output:
     path queryResult 
   script:
     """
-   queryparams=`paste -s ${params.investigationSubset}/familyNcbiTaxonIds.txt |sed 's/\t/[organism:exp] OR /g; s/\$/[organism:exp]/'`
-   esearch -db popset -query '\$queryparams' > queryResult
+   for id in `cat $PWD/../final/familyNcbiTaxonIds.txt`; do printf "txid%d[organism:exp]\\n" \$id; done | paste -sd, | sed 's/,/ OR /g' > querystring
+   esearch -db popset -query "`cat querystring`" > queryResult
     """
 }
 
@@ -159,9 +163,12 @@ process insertPopsetEntityTypeGraph {
   script:
 // TODO: --commit
   """
+if [ ! -h $PWD/$params.investigationBaseName ]; then ln -s $params.investigationSubset/$params.investigationBaseName $PWD/; fi
+if [ ! -h $PWD/$mergeFile ]; then ln -s `realpath $mergeFile` $PWD/; fi
+
 ga ApiCommonData::Load::Plugin::InsertEntityGraph \\
   --isSimpleConfiguration 1 \\
-  --investigationBaseName $params.investigationFileBasename \\
+  --investigationBaseName $params.investigationBaseName \\
   --ontologyMappingFile $params.webDisplayOntologyFile \\
   --ontologyMappingOverrideFileBaseName $params.optionalOntologyMappingOverrideFile \\
   --extDbRlsSpec '$edrs' \\
@@ -176,17 +183,21 @@ workflow loadPopsetEntityGraph {
     initOntologyOut
     main:
   
-    qrOut = getQueryResult();
-    studiesOut = getStudies(qrOut);
-    mappingOut = getGiAccessionMapping(studiesOut);
-    gbOut = getGenbankXml(qrOut);
-    assayWideOut = xtractAssay(gbOut);
-    assayOut = pivotAssay(assayWideOut);
-    pubmedOut = xtractPubmed(gbOut);
-    mergeOut = mergeAll(mappingOut,studiesOut,assayOut,pubmedOut);
+    qrOut = getQueryResult()
+    studiesOut = getStudies(qrOut)
+    mappingOut = getGiAccessionMapping(studiesOut)
+    gbOut = getGenbankXml(qrOut)
+    assayWideOut = xtractAssay(gbOut)
+    assayOut = pivotAssay(assayWideOut)
+    pubmedOut = xtractPubmed(gbOut)
+    mergeOut = mergeAll(mappingOut,studiesOut,assayOut,pubmedOut)
 
-    entityGraphOut = insertPopsetEntityTypeGraph(mergeOut, params.extDbRlsSpec, params.webDisplayOntologySpec, initOntologyOut);
-    attributesOut = loadAttributesAndValues(params.extDbRlsSpec, params.webDisplayOntologySpec, entityGraphOut)
+    def (databaseName, databaseVersion) = params.extDbRlsSpec.split("\\|")
+
+    extDbRlsOut = insertExternalDatabaseAndRelease(tuple(databaseName, databaseVersion), initOntologyOut)
+
+    entityGraphOut = insertPopsetEntityTypeGraph(mergeOut, extDBRlsSpec, webDisplaySpec, initOntologyOut)
+    attributesOut = loadAttributesAndValues(extDBRlsSpec, webDisplaySpec, entityGraphOut).verbiage
   
     emit:
     attributesOut
