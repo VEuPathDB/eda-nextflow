@@ -85,6 +85,7 @@ process pivotAssay {
     assays_wide\$longitude = paste( assays_wide\$latdir, assays_wide\$longitude, sep = "");
     assays_wide\$latitude = mapvalues(assays_wide\$latitude, c("NANA"), c(""));
     assays_wide\$longitude = mapvalues(assays_wide\$longitude, c("NANA"), c(""));
+    assays_wide = mutate(assays_wide, has_geolocation = case_when( !is.na(latitude) ~ 'yes', is.na(latitude) ~ 'no' ) )
     # clean up 
     assays_wide\$lat_lon = NULL;
     assays_wide\$latdir = NULL;
@@ -106,6 +107,19 @@ process xtractPubmed {
     """
 }
 
+process xtractSeqlen {
+  input:
+    path gbxml
+  output:
+    path acc2len
+  script:
+    """
+xtract -input gbxml -pattern INSDSeq -element INSDSeq_accession-version INSDSeq_sequence > acc2seq 
+cut -f2 acc2seq | awk '{print length}' > len 
+paste acc2seq len | cut -f1,3 > acc2len 
+    """
+}
+
 process getGiAccessionMapping {
   input:
     path studies
@@ -113,7 +127,6 @@ process getGiAccessionMapping {
     path gi2acc
   script:
    """
-  /usr/bin/env bash
   for gid in `cut -f1 studies`
     do
     for acc in `efetch -db popset -id \$gid -format gb | transmute -g2x | xtract -pattern INSDSeq -element INSDSeq_accession-version`; do
@@ -129,6 +142,7 @@ process mergeAll {
     path studies
     path assay
     path pubmed 
+    path acc2len 
   output:
     path 'popset.txt'
   script:
@@ -146,13 +160,16 @@ process mergeAll {
   # merge pubmed
   pubmed_df = read_tsv('pubmed', col_names =  c("pubmedid", "pubmed_title", "accession")) %>% mutate_all(as.character);
   finaldf = merge(finaldf,pubmed_df,by = c('accession'), all.x = T);
+  # merge acc2len
+  acc2len_df = read_tsv('acc2len', col_names =  c("accession", "read_length")) %>% mutate_all(as.character);
+  finaldf = merge(finaldf,acc2len_df,by = c('accession'), all.x = T);
   # done
   write_tsv(finaldf, 'popset.txt', na = '');
     """
 }
 
 process insertPopsetEntityTypeGraph {
-
+  tag "plugin"
   input:
     path mergeFile
     val edrs
@@ -163,8 +180,10 @@ process insertPopsetEntityTypeGraph {
   script:
 // TODO: --commit
   """
-if [ ! -h $PWD/$params.investigationBaseName ]; then ln -s $params.investigationSubset/$params.investigationBaseName $PWD/; fi
-if [ ! -h $PWD/$mergeFile ]; then ln -s `realpath $mergeFile` $PWD/; fi
+if [ -h $PWD/$params.investigationBaseName ]; then rm $PWD/$params.investigationBaseName; fi
+ln -s $params.investigationSubset/$params.investigationBaseName $PWD/
+if [ -h $PWD/$mergeFile ]; then rm $PWD/$mergeFile; fi
+ln -s `realpath $mergeFile` $PWD/
 
 ga ApiCommonData::Load::Plugin::InsertEntityGraph \\
   --isSimpleConfiguration 1 \\
@@ -190,7 +209,8 @@ workflow loadPopsetEntityGraph {
     assayWideOut = xtractAssay(gbOut)
     assayOut = pivotAssay(assayWideOut)
     pubmedOut = xtractPubmed(gbOut)
-    mergeOut = mergeAll(mappingOut,studiesOut,assayOut,pubmedOut)
+    seqlenOut = xtractSeqlen(gbOut)
+    mergeOut = mergeAll(mappingOut,studiesOut,assayOut,pubmedOut,seqlenOut)
 
     def (databaseName, databaseVersion) = params.extDbRlsSpec.split("\\|")
 

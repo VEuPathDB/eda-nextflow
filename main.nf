@@ -42,7 +42,7 @@ workflow loadDatasetSpecificAnnotationPropertiesAndGraphsEntry {
 }
 
 workflow popsetEntry {
-    loadInitialOntology | loadPopsetEntityGraph | loadDatasetSpecificAnnotationPropertiesAndGraphs | dumpFiles
+    loadInitialOntology | loadPopsetEntityGraph
 
 }
   
