@@ -1,9 +1,6 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
 
-include { loadAttributesAndValues } from './insertStudy.nf'
-include { insertExternalDatabaseAndRelease } from './insertExternalDatabase.nf'
-
 webDisplaySpec = Channel.value(params.webDisplayOntologySpec)
 extDBRlsSpec = Channel.value(params.extDbRlsSpec)
 
@@ -14,6 +11,8 @@ process getQueryResult {
     """
    for id in `cat $PWD/../final/familyNcbiTaxonIds.txt`; do printf "txid%d[organism:exp]\\n" \$id; done | paste -sd, | sed 's/,/ OR /g' > querystring
    esearch -db popset -query "`cat querystring`" > queryResult
+   count=`xtract -input queryResult -pattern ENTREZ_DIRECT -element Count`
+   if [ \$count -eq 0 ]; then exit 1; else exit 0; fi
     """
 }
 
@@ -21,11 +20,36 @@ process getStudies {
   input:
     path queryResult
   output:
-    path studies 
+    path studiesRaw
   script:
    """
-   cat queryResult |esummary -mode xml | xtract -pattern DocumentSummary -element Gi SetType Title > studies
+   cat queryResult |esummary -mode xml | xtract -pattern DocumentSummary -element Gi SetType Title > studiesRaw
+   count=`wc -l studies |cut -d' '  -f1`
+   if [ \$count -eq 0 ]; then exit 1; else exit 0; fi
+
    """
+}
+
+process shortenTitles {
+  input:
+    path studiesRaw
+  output:
+    path studies
+  script:
+  '''
+  #!/usr/bin/env perl
+  open(FH, "< studiesRaw") or die "Cannot open studiesRaw: $!\n";
+  open(OF, "> studies");
+  while(<FH>){
+    chomp;
+    @a=split /\\t/;
+    if(length($a[2])>400){
+      $a[2] = substr($a[2],0,360) . "... [title truncated]"
+    }
+    printf OF ("%s\n", join("\\t", @a));
+  }
+  '''
+
 }
 
 process getFasta {
@@ -36,6 +60,8 @@ process getFasta {
   script:
    """
    cat queryResult | efetch -format fasta > sequences
+   count=`wc -l sequences |cut -d' '  -f1`
+   if [ \$count -eq 0 ]; then exit 1; else exit 0; fi
    """
 }
 
@@ -47,6 +73,8 @@ process getGenbankXml {
   script:
    """
    cat queryResult | efetch -format gb | transmute -g2x > gbxml
+  count=`wc -l gbxml | cut -d' '  -f1`
+  if [ \$count -eq 0 ]; then exit 1; else exit 0; fi
    """
 }
 
@@ -58,6 +86,8 @@ process xtractAssay {
   script:
     """
   xtract -input gbxml -pattern INSDSeq -ACC INSDSeq_accession-version -group INSDFeature -KEY INSDFeature_key -block INSDQualifier -deq "\n" -element "&ACC" "&KEY" INSDQualifier_name INSDQualifier_value > assayTall
+  count=`wc -l assay |cut -d' '  -f1`
+  if [ \$count -eq 0 ]; then exit 1; else exit 0; fi
     """
 }
 
@@ -104,6 +134,8 @@ process xtractPubmed {
   script:
     """
   xtract -input gbxml -pattern INSDSeq -ACCVER INSDSeq_accession-version -group INSDReference -if INSDReference_pubmed -is-not NULL -element INSDReference_pubmed INSDReference_title "&ACCVER" > pubmed
+  count=`wc -l assay |cut -d' '  -f1`
+  if [ \$count -eq 0 ]; then exit 1; fi
     """
 }
 
@@ -117,6 +149,8 @@ process xtractSeqlen {
 xtract -input gbxml -pattern INSDSeq -element INSDSeq_accession-version INSDSeq_sequence > acc2seq 
 cut -f2 acc2seq | awk '{print length}' > len 
 paste acc2seq len | cut -f1,3 > acc2len 
+  count=`wc -l acc2len |cut -d' '  -f1`
+  if [ \$count -eq 0 ]; then exit 1; fi
     """
 }
 
@@ -133,6 +167,8 @@ process getGiAccessionMapping {
       printf "%s\t%s\n" \$gid \$acc
     done
   done > gi2acc
+  count=`wc -l gi2acc |cut -d' '  -f1`
+  if [ \$count -eq 0 ]; then exit 1; fi
    """
 }
 
@@ -168,42 +204,27 @@ process mergeAll {
     """
 }
 
-process insertPopsetEntityTypeGraph {
-  tag "plugin"
+process copyToFinal {
   input:
     path mergeFile
-    val edrs
-    val webDisplayOntologySpec
-    val initOntology
   output:
     stdout
   script:
-// TODO: --commit
   """
-if [ -h $PWD/$params.investigationBaseName ]; then rm $PWD/$params.investigationBaseName; fi
-ln -s $params.investigationSubset/$params.investigationBaseName $PWD/
-if [ -h $PWD/$mergeFile ]; then rm $PWD/$mergeFile; fi
-ln -s `realpath $mergeFile` $PWD/
-
-ga ApiCommonData::Load::Plugin::InsertEntityGraph \\
-  --isSimpleConfiguration 1 \\
-  --investigationBaseName $params.investigationBaseName \\
-  --ontologyMappingFile $params.webDisplayOntologyFile \\
-  --ontologyMappingOverrideFileBaseName $params.optionalOntologyMappingOverrideFile \\
-  --extDbRlsSpec '$edrs' \\
-  --schema $params.schema \\
-  --metaDataRoot $params.studyDirectory \\
-  --commit
+if [ -h $PWD/../final/$mergeFile ]; then rm $PWD/../final/$mergeFile; fi
+ln -s `realpath $mergeFile` $PWD/../final/
   """
 }
 
-workflow loadPopsetEntityGraph {
+workflow downloadPopset {
+
     take:
     initOntologyOut
     main:
   
     qrOut = getQueryResult()
-    studiesOut = getStudies(qrOut)
+    studiesRawOut = getStudies(qrOut)
+    studiesOut = shortenTitles(studiesRawOut)
     mappingOut = getGiAccessionMapping(studiesOut)
     gbOut = getGenbankXml(qrOut)
     assayWideOut = xtractAssay(gbOut)
@@ -211,16 +232,9 @@ workflow loadPopsetEntityGraph {
     pubmedOut = xtractPubmed(gbOut)
     seqlenOut = xtractSeqlen(gbOut)
     mergeOut = mergeAll(mappingOut,studiesOut,assayOut,pubmedOut,seqlenOut)
-
-    def (databaseName, databaseVersion) = params.extDbRlsSpec.split("\\|")
-
-    extDbRlsOut = insertExternalDatabaseAndRelease(tuple(databaseName, databaseVersion), initOntologyOut)
-
-    entityGraphOut = insertPopsetEntityTypeGraph(mergeOut, extDBRlsSpec, webDisplaySpec, initOntologyOut)
-    attributesOut = loadAttributesAndValues(extDBRlsSpec, webDisplaySpec, entityGraphOut).verbiage
-  
+    copyOut = copyToFinal(mergeOut)
     emit:
-    attributesOut
+    copyOut
 
 }
    
