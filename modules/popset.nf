@@ -207,12 +207,15 @@ process mergeAll {
 process copyToFinal {
   input:
     path mergeFile
+    path fastaFile
+    val datasetName
   output:
     stdout
   script:
   """
-if [ -h $PWD/../final/$mergeFile ]; then rm $PWD/../final/$mergeFile; fi
+if [ -e $PWD/../final/$mergeFile ]; then rm $PWD/../final/$mergeFile; fi
 ln -s `realpath $mergeFile` $PWD/../final/
+ln `realpath $fastaFile` $PWD/${datasetName}.fasta
   """
 }
 
@@ -221,6 +224,8 @@ workflow downloadPopset {
     take:
     initOntologyOut
     main:
+
+    def (datasetName, datasetVersion) = params.extDbRlsSpec.split("\\|")
   
     qrOut = getQueryResult()
     studiesRawOut = getStudies(qrOut)
@@ -232,7 +237,8 @@ workflow downloadPopset {
     pubmedOut = xtractPubmed(gbOut)
     seqlenOut = xtractSeqlen(gbOut)
     mergeOut = mergeAll(mappingOut,studiesOut,assayOut,pubmedOut,seqlenOut)
-    copyOut = copyToFinal(mergeOut)
+    fastaOut = getFasta(qrOut)
+    copyOut = copyToFinal(mergeOut,fastaOut,datasetName)
     emit:
     copyOut
 
