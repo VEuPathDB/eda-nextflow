@@ -24,12 +24,12 @@ fi
 
 ga ApiCommonData::Load::Plugin::MBioInsertEntityGraph \$internalOntologyMappingOverrideFile \$internalValueMappingFile \$internalIsRelativeAbundance \$internalGusConfigFile \\
   --commit \\
-  --investigationFile "${params.studyDirectory}/${params.investigationBaseName}" \\
-  --sampleDetailsFile "${params.studyDirectory}/${params.sampleDetailsFile}" \\
-  --mbioResultsDir "${params.studyDirectory}/${params.assayResultsDirectory}" \\
+  --investigationFile "${studyDir}/${params.investigationBaseName}" \\
+  --sampleDetailsFile "${studyDir}/${params.sampleDetailsFile}" \\
+  --mbioResultsDir "${studyDir}/${params.assayResultsDirectory}" \\
   --mbioResultsFileExtensions "$params.assayResultsFileExtensionsJson" \\
   --dieOnFirstError 1 \\
-  --ontologyMappingFile $params.webDisplayOntologyFile \\
+  --ontologyMappingFile $ontologyMappingOrOwlFile \\
   --extDbRlsSpec \'$extDbRlsSpec\' \\
   --schema $params.schema \\
   --useOntologyTermTableForTaxonTerms 1
