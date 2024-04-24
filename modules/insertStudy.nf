@@ -39,6 +39,8 @@ process insertEntityTypeGraph {
     val webDisplayOntologySpec
     val extDBIsReady
     val ontologySpecIsReady
+    val studyDir
+    val ontologyMappingOrOwlFile
 
     output:
     stdout
@@ -162,6 +164,8 @@ process loadDatasetSpecificTables {
 workflow loadEntityGraph {
     take:
     initOntologyOut
+    studyDir
+    ontologyMappingOrOwlFile
 
     main:
 
@@ -169,7 +173,7 @@ workflow loadEntityGraph {
 
     extDbRlsOut = insertExternalDatabaseAndRelease(tuple(databaseName, databaseVersion), initOntologyOut)
 
-    entityGraphOut = insertEntityTypeGraph(extDBRlsSpec, webDisplaySpec, extDbRlsOut, initOntologyOut)
+    entityGraphOut = insertEntityTypeGraph(extDBRlsSpec, webDisplaySpec, extDbRlsOut, initOntologyOut, studyDir, ontologyMappingOrOwlFile)
     attributesOut = loadAttributesAndValues(extDBRlsSpec, webDisplaySpec, entityGraphOut).verbiage
 
     emit:

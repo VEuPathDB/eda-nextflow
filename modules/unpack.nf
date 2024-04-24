@@ -25,6 +25,7 @@ process makeOntologyFiles {
     output:
     path "ontology_terms.txt", emit: ontology_terms
     path "ontology_relationships.txt", emit: ontology_relationships
+    path "${studyDir}/ontologyMapping.xml", emit: ontology_mapping
 
     script:
     """
@@ -59,6 +60,8 @@ process addGeotermsToOntologyFiles {
     output:
     path "ontology_terms.txt", emit: ontology_terms
     path "ontology_relationships.txt", emit: ontology_relationships
+    path "${studyDir}/ontologyMapping.xml", emit: ontology_mapping
+
 
     script:
     """
@@ -75,16 +78,33 @@ process addGeotermsToOntologyFiles {
 }
 
 
+process makeDirectoryForStudies {
+    input:
+    path studyDir
+
+    output:
+    path "isaSimpleDirectory"
+
+    script:
+    """
+    mkdir isaSimpleDirectory
+    mv $studyDir isaSimpleDirectory
+    """
+}
+
+
 workflow unpack {
     main:
 
     parsedStudyDir = makeSimpleFiles();
     ontologyTermsAndRelationships = makeOntologyFiles(parsedStudyDir)
+    isaSimpleDir = makeDirectoryForStudies(parsedStudyDir)
 
     emit:
-    parsedStudyDir
-    ontologyTermsAndRelationships.ontology_terms
-    ontologyTermsAndRelationships.ontology_relationships
+    isaSimpleDir = isaSimpleDir
+    ontology_terms = ontologyTermsAndRelationships.ontology_terms
+    ontology_relationships = ontologyTermsAndRelationships.ontology_relationships
+    ontology_mapping = ontologyTermsAndRelationships.ontology_mapping
 }
 
 
@@ -93,9 +113,11 @@ workflow unpackBiom {
 
     parsedStudyDir = makeSimpleFilesFromParsedBiom();
     ontologyTermsAndRelationships = addGeotermsToOntologyFiles(parsedStudyDir)
+    isaSimpleDir = makeDirectoryForStudies(parsedStudyDir)
 
     emit:
-    parsedStudyDir
-    ontologyTermsAndRelationships.ontology_terms
-    ontologyTermsAndRelationships.ontology_relationships
+    isaSimpleDir = isaSimpleDir
+    ontology_terms = ontologyTermsAndRelationships.ontology_terms
+    ontology_relationships = ontologyTermsAndRelationships.ontology_relationships
+    ontology_mapping = ontologyTermsAndRelationships.ontology_mapping
 }

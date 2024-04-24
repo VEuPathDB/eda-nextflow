@@ -30,15 +30,20 @@ include { downloadPopset } from './modules/popset.nf'
 // Main workflow
 //---------------------------------------------------------------------------------
 workflow {
-    loadInitialOntology | loadEntityGraph | loadDatasetSpecificAnnotationPropertiesAndGraphs | dumpFiles
+    loadInitialOntology()
+    loadEntityGraph(loadInitialOntology.out, params.studyDirectory, params.webDisplayOntologyFile)
+    loadDatasetSpecificAnnotationPropertiesAndGraphs(loadEntityGraph.out)
+    dumpFiles(loadDatasetSpecificAnnotationPropertiesAndGraphs.out)
 }
 
 workflow loadEntityGraphEntry {
-    loadInitialOntology | loadEntityGraph;
+    loadInitialOntology()
+    loadEntityGraph(loadInitialOntology.out, params.studyDirectory, params.webDisplayOntologyFile)
 }
 
 workflow loadDatasetSpecificAnnotationPropertiesAndGraphsEntry {
-    loadDatasetSpecificAnnotationPropertiesAndGraphs(Channel.value("READY!")) | dumpFiles
+    loadDatasetSpecificAnnotationPropertiesAndGraphs(Channel.value("READY!"))
+    dumpFiles(loadDatasetSpecificAnnotationPropertiesAndGraphs.out)
 }
 
 workflow popsetEntry {
@@ -52,12 +57,19 @@ workflow fileDumper {
 }
 
 workflow loadUserDataset {
-    unpack | loadOntologyFromTabDelim | loadEntityGraph | loadDatasetSpecificAnnotationPropertiesAndGraphs | dumpUserDatasetFiles
-    //loadDatasetSpecificAnnotationPropertiesAndGraphs(Channel.value("READY!"));
+    unpack()
+    loadOntologyFromTabDelim(unpack.out.isaSimpleDir, unpack.out.ontology_terms, unpack.out.ontology_relationships)
+    loadEntityGraph(loadOntologyFromTabDelim.out, unpack.out.isaSimpleDir, unpack.out.ontology_mapping)
+    loadDatasetSpecificAnnotationPropertiesAndGraphs(loadEntityGraph.out)
+    dumpUserDatasetFiles(loadDatasetSpecificAnnotationPropertiesAndGraphs.out)
 }
 
 
 workflow loadBiomUserDataset {
-    //unpack | loadOntologyFromTabDelim | loadEntityGraph | loadDatasetSpecificAnnotationPropertiesAndGraphs | dumpUserDatasetFiles
-    unpackBiom | loadOntologyFromTabDelim | loadEntityGraph | loadDatasetSpecificAnnotationPropertiesAndGraphs | dumpUserDatasetFiles
+    unpackBiom()
+    loadOntologyFromTabDelim(unpackBiom.out.isaSimpleDir, unpackBiom.out.ontology_terms, unpackBiom.out.ontology_relationships)
+    loadEntityGraph(loadOntologyFromTabDelim.out, unpackBiom.out.isaSimpleDir, unpackBiom.out.ontology_mapping)
+    loadDatasetSpecificAnnotationPropertiesAndGraphs(loadEntityGraph.out)
+    dumpUserDatasetFiles(loadDatasetSpecificAnnotationPropertiesAndGraphs.out)
+
 }

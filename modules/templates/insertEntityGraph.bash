@@ -62,8 +62,8 @@ fi
 
 # two commas here makes string lower case
 if [ "$params.isaFormat" == "simple" ] ; then
-    internalInvestigationFile="${params.studyDirectory}/${params.investigationBaseName}";
-    internalOntologyMappingFile="--ontologyMappingFile ${params.webDisplayOntologyFile}";
+    internalInvestigationFile="${studyDir}/${params.investigationBaseName}";
+    internalOntologyMappingFile="--ontologyMappingFile ${ontologyMappingOrOwlFile}";
     internalUseIsaSimpleParser="--isSimpleConfiguration ";
 
     if [ "${params.optionalDateObfuscationFile}" != "NA" ] ; then
@@ -83,7 +83,7 @@ ga ApiCommonData::Load::Plugin::InsertEntityGraph \$internalGusConfigFile \$inte
   --commit \\
   --extDbRlsSpec \'$extDbRlsSpec\' \\
   --investigationBaseName $params.investigationBaseName \\
-  --metaDataRoot $params.studyDirectory \\
+  --metaDataRoot $studyDir \\
   --schema $params.schema
 
 stopSingularityInstance
