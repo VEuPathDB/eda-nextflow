@@ -47,7 +47,9 @@ workflow loadDatasetSpecificAnnotationPropertiesAndGraphsEntry {
 }
 
 workflow popsetEntry {
-    loadInitialOntology | downloadPopset | loadEntityGraph
+    loadInitialOntology()
+    downloadPopset(loadInitialOntology.out)
+    loadEntityGraph(downloadPopset.out, params.studyDirectory, params.webDisplayOntologyFile)
 
 }
   

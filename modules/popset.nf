@@ -106,6 +106,9 @@ process pivotAssay {
   assays_wide\$translation = NULL;
   assays_wide\$transl_table = NULL;
   assays_wide\$transl_except = NULL;
+  assays_wide\$genbank_country = assays_wide\$country;
+  assays_wide\$country = NULL;
+  assays_wide = mutate(assays_wide, country = str_extract( genbank_country, "^[^:]+"));
   if( 'lat_lon' %in% names(assays_wide) ){
     cat(sprintf("Parsing lat_lon..."));
     assays_wide = separate_wider_delim(assays_wide, lat_lon, " ", names = c("latitude","latdir","longitude","londir"));
@@ -213,9 +216,9 @@ process copyToFinal {
     stdout
   script:
   """
-if [ -e $PWD/../final/$mergeFile ]; then rm $PWD/../final/$mergeFile; fi
+if [ -h $PWD/../final/$mergeFile ]; then rm $PWD/../final/$mergeFile; fi
 ln -s `realpath $mergeFile` $PWD/../final/
-ln `realpath $fastaFile` $PWD/${datasetName}.fasta
+ln `realpath $fastaFile` $PWD/../${datasetName}.fasta
   """
 }
 
