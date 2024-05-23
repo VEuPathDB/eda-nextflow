@@ -110,6 +110,7 @@ process pivotAssay {
   assays_wide\$country = NULL;
   assays_wide = mutate(assays_wide, country = str_extract( genbank_country, "^[^:]+"));
   if( 'lat_lon' %in% names(assays_wide) ){
+    assays_wide = mutate(assays_wide, has_geolocation = case_when( !is.na(lat_lon) ~ 'yes', is.na(lat_lon) ~ 'no' ) )
     cat(sprintf("Parsing lat_lon..."));
     assays_wide = separate_wider_delim(assays_wide, lat_lon, " ", names = c("latitude","latdir","longitude","londir"));
     assays_wide\$latdir = mapvalues( assays_wide\$latdir, c("N", "S"), c("", "-"));
@@ -118,11 +119,10 @@ process pivotAssay {
     assays_wide\$longitude = paste( assays_wide\$latdir, assays_wide\$longitude, sep = "");
     assays_wide\$latitude = mapvalues(assays_wide\$latitude, c("NANA"), c(""));
     assays_wide\$longitude = mapvalues(assays_wide\$longitude, c("NANA"), c(""));
-    assays_wide = mutate(assays_wide, has_geolocation = case_when( !is.na(latitude) ~ 'yes', is.na(latitude) ~ 'no' ) )
     # clean up 
-    assays_wide\$lat_lon = NULL;
-    assays_wide\$latdir = NULL;
-    assays_wide\$londir = NULL;
+   #assays_wide\$lat_lon = NULL;
+   #assays_wide\$latdir = NULL;
+   #assays_wide\$londir = NULL;
     cat(sprintf("Done\n"));
   }
   write_tsv(assays_wide, "assay", na = "");
